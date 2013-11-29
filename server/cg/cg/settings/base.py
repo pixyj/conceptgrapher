@@ -37,10 +37,12 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'pagedown',
     'uber',
     'topo',
     'quiz',
-    'pagedown',
+    'ang',
+    
 )
 
 MIDDLEWARE_CLASSES = (
