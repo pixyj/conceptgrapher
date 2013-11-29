@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import TestCase, TransactionTestCase, Client
 from django.db import IntegrityError
 
 from networkx import NetworkXUnfeasible
@@ -8,11 +8,12 @@ from quiz.models import Quiz, Choice
 
 import simplejson
 
-class ConceptSlugTestCase(TestCase):
+class ConceptSlugTestCase(TransactionTestCase):
 	"""
 	Check if slug updates on edit
 	This tests uber's on_save method
 	"""
+
 	def setUp(self):
 		topic = Topic.objects.create(name="topic")
 		Concept.objects.create(topic=topic, name="Concept One")
@@ -56,7 +57,7 @@ class ModelIntegrityTestCase(TestCase):
 		raise IntegrityError
 
 
-class TopologyTest(TestCase):
+class TopologyTest(TransactionTestCase):
 	"""
 	Ensures if Error is raised when the concept graph becomes cyclic.
 	"""
@@ -73,7 +74,7 @@ class TopologyTest(TestCase):
 		except NetworkXUnfeasible:
 			return
 
-		print "NetworkXUnfeasible must have been called"	
+		print "NetworkXUnfeasible must have been raised"	
 		raise NetworkXUnfeasible	
 
 	def create_relationship_from_ids(self, before_id, after_id):

@@ -3,7 +3,11 @@ import networkx as nx
 from .models import ConceptRelationship
 
 def validate_concept_relationship_acyclic(instance):
-	
+	"""
+	Ensures that the concept dependency graph is acyclic
+	If not, a networkx infeasible error is raised. 
+	Should create a wrapper error?
+	"""
 	di_graph = nx.DiGraph()
 	rels = ConceptRelationship.objects.all()
 	for rel in rels:

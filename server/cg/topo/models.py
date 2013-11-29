@@ -52,7 +52,7 @@ class ConceptRelationship(TimestampedModel):
 
 
 
-class ConceptQuiz(TimestampedModel):
+class ConceptQuiz(models.Model):
 	concept = models.ForeignKey(Concept)
 	quiz = models.ForeignKey(Quiz)
 
