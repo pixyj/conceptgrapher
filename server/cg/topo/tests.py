@@ -1,9 +1,14 @@
 from django.test import TestCase
 from django.db import IntegrityError
 
+from networkx import NetworkXUnfeasible
 from topo.models import Topic, Concept, ConceptRelationship
 
 class ConceptSlugTestCase(TestCase):
+	"""
+	Check if slug updates on edit
+	This tests uber's on_save method
+	"""
 	def setUp(self):
 		topic = Topic.objects.create(name="topic")
 		Concept.objects.create(topic=topic, name="Concept One")
@@ -13,8 +18,7 @@ class ConceptSlugTestCase(TestCase):
 		self.assertEqual(c.slug, "concept-one")
 		c.name = "Concept Two"
 		c.save()
-		#Check if slug updates on edit
-		#This tests uber's on_save method
+
 		self.assertEqual(c.slug, "concept-two") 
 
 
@@ -47,4 +51,47 @@ class ModelIntegrityTestCase(TestCase):
 
 		raise IntegrityError
 
+
+class TopologyTest(TestCase):
+	"""
+	Ensures if Error is raised when the concept graph becomes cyclic.
+	"""
+	def setUp(self):
+		self.t = Topic.objects.create(name="one")
+		self.c1 = Concept.objects.create(topic=self.t, name="1")
+		self.c2 = Concept.objects.create(topic=self.t, name="2")
+		r = ConceptRelationship.objects.create(before=self.c1, after=self.c2)
+		
+
+	def test_immediate_top_error(self):
+		try:
+			r2 = ConceptRelationship.objects.create(before=self.c2, after=self.c1)
+		except NetworkXUnfeasible:
+			return
+
+		print "NetworkXUnfeasible must have been called"	
+		raise NetworkXUnfeasible	
+
+	def create_relationship_from_ids(self, before_id, after_id):
+		before = Concept.objects.get(name=str(before_id))
+		after = Concept.objects.get(name=str(after_id))
+		ConceptRelationship.objects.create(before=before, after=after)
+		
+	def test_generic_cyclic_error(self):
+		concepts = [str(i) for i in xrange(10, 20)]
+		for c in concepts:
+			Concept.objects.create(topic=self.t, name=c)
+		initial_relations = [(10, 11), (11, 12), (12, 13)]
+		for before_id, after_id in initial_relations:
+			self.create_relationship_from_ids(before_id, after_id)
+
+		try:
+			self.create_relationship_from_ids(13, 10)
+		except NetworkXUnfeasible:
+			return
+
+		raise NetworkXUnfeasible
+
+			
+		
 

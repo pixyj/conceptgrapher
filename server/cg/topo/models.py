@@ -49,7 +49,7 @@ class ConceptRelationship(TimestampedModel):
 
 
 
-
+import receivers
 
 
 
