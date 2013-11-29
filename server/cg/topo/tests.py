@@ -2,7 +2,9 @@ from django.test import TestCase, Client
 from django.db import IntegrityError
 
 from networkx import NetworkXUnfeasible
-from topo.models import Topic, Concept, ConceptRelationship
+
+from topo.models import Topic, Concept, ConceptRelationship, ConceptQuiz
+from quiz.models import Quiz, Choice
 
 import simplejson
 
@@ -118,3 +120,31 @@ class ConceptByTopicTest(TestCase):
 		c = Client()
 		response = c.get("/api/topo/topic/asdfasdf/concepts/")
 		self.assertEqual(response.status_code, 404)
+
+
+class QuizzesByConceptTest(TestCase):
+	def setUp(self):
+		self.QUIZ_COUNT = 10
+		self.CHOICE_COUNT = 4
+		self.topic = Topic.objects.create(name="1")
+		self.c1 = Concept.objects.create(topic=self.topic, name="2")
+
+		for i in xrange(self.QUIZ_COUNT):
+			q = Quiz.objects.create(question="question:{}".format(i))
+			ConceptQuiz.objects.create(concept=self.c1, quiz=q)
+			for i in xrange(self.CHOICE_COUNT):
+				Choice.objects.create(quiz=q, text="yep {}".format(i), is_correct=True)
+
+
+
+	def test_quiz_by_concept(self):
+		c = Client()
+		response = c.get("/api/topo/concept/1/quizzes/")
+		self.assertEqual(response.status_code, 200)
+		quizzes = simplejson.loads(response.content)
+		self.assertEqual(len(quizzes), self.QUIZ_COUNT)
+		for q in quizzes:
+			self.assertEqual(len(q['choices']), self.CHOICE_COUNT)
+
+	
+

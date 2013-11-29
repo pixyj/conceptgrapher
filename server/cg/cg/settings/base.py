@@ -39,6 +39,7 @@ INSTALLED_APPS = (
 
     'uber',
     'topo',
+    'quiz',
 )
 
 MIDDLEWARE_CLASSES = (

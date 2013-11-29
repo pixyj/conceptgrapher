@@ -1,6 +1,8 @@
 from django.db import models
 from uber.models import SluggedTimeStampedModel, TimestampedModel
 
+from quiz.models import Quiz
+
 class Topic(SluggedTimeStampedModel):
 	name = models.CharField(max_length=128, unique=True)
 
@@ -49,6 +51,21 @@ class ConceptRelationship(TimestampedModel):
 
 
 
+
+class ConceptQuiz(TimestampedModel):
+	concept = models.ForeignKey(Concept)
+	quiz = models.ForeignKey(Quiz)
+
+	class Meta:
+		unique_together = ("concept", "quiz")
+
+	def __unicode__(self):
+		return "{}: {}".format(self.concept, self.quiz)
+
+
+
+
+#For signals
 import receivers
 
 
