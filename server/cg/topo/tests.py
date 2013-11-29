@@ -146,5 +146,8 @@ class QuizzesByConceptTest(TestCase):
 		for q in quizzes:
 			self.assertEqual(len(q['choices']), self.CHOICE_COUNT)
 
-	
+
+	def test_404(self):
+		response = Client().get("/api/topo/concept/10000/quizzes/")
+		self.assertEqual(response.status_code, 404)
 
