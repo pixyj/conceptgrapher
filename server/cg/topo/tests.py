@@ -1,8 +1,10 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.db import IntegrityError
 
 from networkx import NetworkXUnfeasible
 from topo.models import Topic, Concept, ConceptRelationship
+
+import simplejson
 
 class ConceptSlugTestCase(TestCase):
 	"""
@@ -93,5 +95,26 @@ class TopologyTest(TestCase):
 		raise NetworkXUnfeasible
 
 			
-		
 
+class ConceptByTopicTest(TestCase):
+	def setUp(self):
+		self.t = Topic.objects.create(name="One Two Three")
+		self.CONCEPT_COUNT = 10
+		for i in xrange(self.CONCEPT_COUNT):
+			Concept.objects.create(topic=self.t, name=str(i))
+
+
+	def test_json_response(self):
+		c = Client()
+		response = c.get("/api/topo/topic/one-two-three/concepts/")
+		
+		self.assertEqual(response.status_code, 200)
+		concepts = simplejson.loads(response.content)
+		print concepts
+		self.assertEqual(len(concepts), self.CONCEPT_COUNT)
+
+
+	def test_404(self):
+		c = Client()
+		response = c.get("/api/topo/topic/asdfasdf/concepts/")
+		self.assertEqual(response.status_code, 404)
