@@ -109,17 +109,16 @@ class ConceptByTopicTest(TestCase):
 
 	def test_json_response(self):
 		c = Client()
-		response = c.get("/api/topo/topic/one-two-three/concepts/")
+		response = c.get("/api/topo/topic/one-two-three/concepts")
 		
 		self.assertEqual(response.status_code, 200)
 		concepts = simplejson.loads(response.content)
-		print concepts
 		self.assertEqual(len(concepts), self.CONCEPT_COUNT)
 
 
 	def test_404(self):
 		c = Client()
-		response = c.get("/api/topo/topic/asdfasdf/concepts/")
+		response = c.get("/api/topo/topic/asdfasdf/concepts")
 		self.assertEqual(response.status_code, 404)
 
 
@@ -140,7 +139,7 @@ class QuizzesByConceptTest(TestCase):
 
 	def test_quiz_by_concept(self):
 		c = Client()
-		response = c.get("/api/topo/concept/1/quizzes/")
+		response = c.get("/api/topo/concept/1/quizzes")
 		self.assertEqual(response.status_code, 200)
 		quizzes = simplejson.loads(response.content)
 		self.assertEqual(len(quizzes), self.QUIZ_COUNT)
@@ -149,6 +148,6 @@ class QuizzesByConceptTest(TestCase):
 
 
 	def test_404(self):
-		response = Client().get("/api/topo/concept/10000/quizzes/")
+		response = Client().get("/api/topo/concept/10000/quizzes")
 		self.assertEqual(response.status_code, 404)
 
