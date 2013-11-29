@@ -28,7 +28,7 @@ class Concept(SluggedTimeStampedModel):
 		unique_together = ("topic", "name")	
 
 
-class ConceptResource(TimestampedModel):
+class ConceptResource(models.Model):
 	concept = models.ForeignKey(Concept)
 	url = models.URLField(max_length=256)
 
