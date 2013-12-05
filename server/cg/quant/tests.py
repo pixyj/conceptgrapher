@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import TestCase, TransactionTestCase, Client
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 
@@ -10,7 +10,7 @@ from .models import ConceptQuizAttempt, convert_anon_attempt_to_user_attempt
 
 
 
-class TestAttemptBase(TestCase):
+class AttemptBaseTest(TestCase):
 	def setUp(self):
 		load_all()
 		self.u = User.objects.create(username="hi")
@@ -23,7 +23,7 @@ class TestAttemptBase(TestCase):
 		}
 
 
-class TestCreateAttempt(TestAttemptBase):
+class CreateAttemptTest(AttemptBaseTest):
 
 	def test_user_duplicate_attempt(self):
 		attrs = dict(self.attrs)
@@ -66,7 +66,7 @@ class TestCreateAttempt(TestAttemptBase):
 		ConceptQuizAttempt.objects.create(**attrs)
 
 
-class TestConvertAttempt(TestAttemptBase):
+class ConvertAttemptTest(AttemptBaseTest):
 
 	def test_convert(self):
 		attrs = dict(self.attrs)
@@ -137,26 +137,68 @@ class AttemptCreateApiTest(TestCase):
 		self.assertEqual(response.status_code, 400)
 
 
-	# TODO. Test Case for logged in user 
-	# def test_user_create(self):
-	# 	c = self.c
-	# 	url = "/api/quant/attempt/create"
-	# 	u = User.objects.create(username="hi", password="hi", is_staff=True)
-	# 	ok = c.post('/admin/', {'username': "pramodliv1asdf", 'password': "a"})
-	# 	import pdb
-	# 	pdb.set_trace()
-	# 	attrs = {
-	# 		'concept_quiz_id': 1,
-	# 		'guess': "22",
-	# 		'result': False,
-	# 	}
+from uber.tests import UserClient
+from django.db import transaction
 
-	# 	response = c.post(url, data=attrs, content_type="text")
-	# 	self.assertEqual(response.status_code, 200)
+class AttemptCreateAndFetchTest(TransactionTestCase):
+	"""
+	Identical guesses for same user not allowed.
+	For different users is allowed
+	"""
+	def setUp(self):
+		load_all()
+		user_names = ['hi', 'bye']
+		self.users = []
+		self.clients = []
+		global force_bytes_patch
+		for u in user_names:
+			u = User.objects.create(username=u, password=u)
+			c = UserClient()
+			c._encode_data = force_bytes_patch
+			c.login_user(u)
+			self.clients.append(c)
+			self.users.append(u)
+		
 
-	# 	response = c.post(url, data=attrs, content_type="text")
-	# 	print response
-	# 	self.assertEqual(response.status_code, 400)
+	def test_create_and_fetch(self):
+		for i in xrange(len(self.users)):
+			self.create_from_api(self.clients[i], self.users[i])
+		
+		for i in xrange(len(self.users)):
+			self.fetch_from_api(self.clients[i], self.users[i])
+
+
+	def fetch_from_api(self, client, user):
+		url = "/api/quant/attempt/all"
+		response = client.get(url)
+		data = simplejson.loads(response.content)
+		self.assertEqual(len(data), 2)
+
+
+	def create_from_api(self, client, user):
+		c = client
+		create_url = "/api/quant/attempt/create"
+		attrs = {
+			'concept_quiz_id': 1,
+			'guess': "22",
+			'result': False,
+		}
+		response = c.post(create_url, data=attrs, content_type="text")
+		self.assertEqual(response.status_code, 200)
+
+		attrs['result'] = True
+		response = c.post(create_url, data=attrs, content_type="text")
+		self.assertEqual(response.status_code, 400)
+
+		attrs['guess'] = "33"
+		response = c.post(create_url, data=attrs, content_type="text")
+		self.assertEqual(response.status_code, 200)
+		
+		self.assertEqual(user.conceptquizattempt_set.count(), 2)
+
+
+
+
 
 
 
