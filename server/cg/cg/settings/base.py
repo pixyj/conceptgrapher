@@ -38,9 +38,11 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'pagedown',
+    
     'uber',
     'topo',
     'quiz',
+    'quant',
     'ang',
     
 )

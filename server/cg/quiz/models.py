@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 from uber.models import TimestampedModel
 
@@ -21,7 +22,6 @@ class Choice(models.Model):
 
 	class Meta:
 		unique_together = ("quiz", "text")
-
 
 
 
