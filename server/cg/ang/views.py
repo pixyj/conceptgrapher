@@ -7,3 +7,4 @@ def show_angular_index(request, *args, **kwargs):
 		raise Http404
 
 	return render(request, 'index.html')
+
