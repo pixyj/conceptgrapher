@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.db import IntegrityError
 
@@ -6,7 +6,7 @@ from uber.serializers import model_to_jsonable_dict, ModelSerializer
 from .models import ConceptQuizAttempt
 from .forms import ConceptQuizAttemptForm
 from topo.serializers import ConceptQuizSerializer
-
+from topo.models import Concept, ConceptQuiz
 
 import simplejson
 
@@ -46,6 +46,10 @@ class QuizAttemptSerializer(ModelSerializer):
 		fields = ['created', 'guess', 'result']
 
 def get_all_attempts(request):
+	"""
+	Returns all attempts by user including quiz details.
+	For the dashboard page
+	"""
 	if request.method != 'GET':
 		return HttpResponse(status=403)
 
@@ -70,3 +74,41 @@ def get_all_attempts(request):
 		
 	response = simplejson.dumps(json_attempts)
 	return HttpResponse(response, content_type="application/json")
+
+
+def get_attempts_by_concept_id(request, concept_id):
+	"""
+	Returns only attempts. Doesn't join with concept_quiz 
+	unlike get_all_attempts. Used in concept-quiz page
+	"""
+	if request.method != 'GET':
+		return HttpResponse(status=403)
+
+	concept = get_object_or_404(Concept, pk=concept_id)
+	concept_quiz_ids = [cq.id for cq in concept.conceptquiz_set.all()]
+
+
+	if request.user.is_authenticated():
+		user_filter = ConceptQuizAttempt.objects.filter(user=request.user)
+	else:
+		session_key = request.session.session_key
+		if not session_key:
+			user_filter = []
+		else:
+			user_filter = ConceptQuizAttempt.objects.filter(session_key=session_key)
+
+
+	concept_quiz_filter = user_filter.filter(concept_quiz_id__in=concept_quiz_ids)		
+
+
+	serializer = QuizAttemptSerializer()
+	json_attempts = []		
+	for attempt in concept_quiz_filter.all():
+		attrs = serializer.to_dict(attempt)
+		json_attempts.append(attrs)
+
+	response = simplejson.dumps(json_attempts)
+	return HttpResponse(response, content_type="application/json")
+
+
+
