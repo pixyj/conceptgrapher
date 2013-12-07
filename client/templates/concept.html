@@ -2,8 +2,53 @@
 
 {% block content %}
 
+<h2>
+	<a href="/{{ topic.slug }}/">{{ topic.name }}</a> - 
+	<a href="/{{ topic.slug }}/{{ concept.slug }}/">{{ concept.name }}</a>
+</h2>
+
+
+<div id="quiz-list">
+</div>
+
 {% endblock %}
 
 {% block js_objects %}
-	JSON_ATTEMPTS = {{ JSON_ATTEMPTS | safe}}
+	quizData = {{ json_attrs | safe }}
+{% endblock %}
+
+{% block templates %}
+<script type="text/html" id="single-quiz-template">
+	<h3 class="mk"> <%= question %> </h3>
+	<% if(isMCQ) { %>
+		<div class="choices">
+		</div>
+	<% } else { %>
+		<div class="row">
+		<div class="col-lg-2">
+			<input type="text" class="form-control"/>
+		</div>
+		</div>
+	<% } %>
+</script>
+
+<script type="text/html" id="choice-template">
+	<div class="row choice-row">
+	  <div class="col-lg-4">
+	    <div class="input-group">
+	      <span class="input-group-addon">
+	        <input type="checkbox" id="choice-<%= cid %>">
+	      </span>
+	      <label for="choice-<%= cid %>" class="form-control"> <%= text %> </label>
+	    </div><!-- /input-group -->
+	  </div><!-- /.col-lg-4 -->
+	</div><!-- /.row -->
+</script>
+
+
+{% endblock %}
+
+
+{% block js %}
+	<script type="text/javascript" src="{{ STATIC_URL }}js/quiz.js"> </script>
 {% endblock %}

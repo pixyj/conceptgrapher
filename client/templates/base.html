@@ -1,6 +1,13 @@
 <!doctype html>
 <html>
+<head>
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/base.css">
+
+</head>
+
 	<body>
+	<div id="container">
 		
 		{% block content %}
 		{% endblock %}
@@ -9,6 +16,18 @@
 		{% block js_objects %}
 		{% endblock %}
 		</script>
+
+		<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jq.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}js/lib/underscore.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}js/lib/backbone.js"></script>
+
+		{% block templates %}
+		{% endblock %}
+
+		{% block js %}
+		{% endblock %}
+
+	</div>	
 
 	</body>
 </html>

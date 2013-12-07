@@ -11,13 +11,12 @@ def load_table(fixture_file):
 	management.call_command("loaddata", fixture_path)
 
 
-
 def load_all():
 	management.call_command("syncdb")
 	graph.initialize_graph()	
-	models += ['Auth']
-	models = ['Topic', 'Concept', 'ConceptRelationship', 'ConceptResource']
-	models += ['Quiz', 'Choice', 'QuizAttempt']
+	models = ['Auth']
+	models += ['Topic', 'Concept', 'ConceptRelationship', 'ConceptResource']
+	models += ['Quiz', 'Choice', 'UserQuizAttempt', 'AnonQuizAttempt']
 	
 
 	for m in models:
@@ -62,16 +61,15 @@ def ok():
 	return quizzes
 
 from django.contrib.auth.models import User
-from quiz.models import Quiz, QuizAttempt
+from quiz.models import Quiz, AnonQuizAttempt
 
 def attempts():
-	for name in ["one", "two"]:
-		u = User.objects.get(username=name)
+	for session_key in ["x", "y"]:
 		for j in range(1, 81):
 			for x in [1, 2]:
 				q = Quiz.objects.get(pk=j)
-				a = QuizAttempt.objects.create(quiz=q, guess=str(x), 
-					user=u, result=False)
+				a = AnonQuizAttempt.objects.create(quiz=q, guess=str(x), 
+					session_key=session_key, result=False)
 				if x == 2:
 					a.result = True
 					a.save()
