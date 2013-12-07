@@ -19,7 +19,7 @@
 
 {% block templates %}
 <script type="text/html" id="single-quiz-template">
-	<h3 class="mk"> <%= question %> </h3>
+	<h3> <%= question %> </h3>
 	<% if(isMCQ) { %>
 		<div class="choices">
 		</div>
@@ -50,5 +50,6 @@
 
 
 {% block js %}
+	<script type="text/javascript" src="{{ STATIC_URL }}js/lib/Markdown.Converter.js"> </script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/quiz.js"> </script>
 {% endblock %}

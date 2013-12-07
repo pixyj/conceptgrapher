@@ -85,12 +85,14 @@ var AttemptCollection = Backbone.Collection.extend({
 	model: Attempt
 });
 
+var mk = new Markdown.Converter();
+
 var Quiz = Backbone.Model.extend({
 	parse: function(attrs) {
 		console.log(attrs);
 		this.attempts = new AttemptCollection(attrs.attempts)
 		delete attrs.attempts;
-		
+		attrs.question = mk.makeHtml(attrs.question);
 		attrs.isMCQ = attrs.choices.length !== 0;
 
 		this.choices = new ChoiceCollection(attrs.choices, {parse:true});
