@@ -102,7 +102,7 @@ def get_attempts_by_concept_id(request, concept_id):
 
 
 	serializer = QuizAttemptSerializer()
-	json_attempts = []		
+	json_attempts = []
 	for attempt in concept_quiz_filter.all():
 		attrs = serializer.to_dict(attempt)
 		json_attempts.append(attrs)
