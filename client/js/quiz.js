@@ -40,11 +40,27 @@ var ListView = BaseView.extend({
 });
 
 var ChoiceView = BaseView.extend({
-	template: "#choice-template"
+	template: "#choice-template",
+	checkAnswer: function() {
+		var guess = this.$el.find("input").is(":checked");
+		var store = {
+			guess: ""
+		};
+		store.result = (guess === this.model.get("is_correct"));
+		if(guess) {
+			store.guess = this.model.get("text");
+		}
+		return store;
+	}
 })
 
 var QuizView = BaseView.extend({
 	template: "#single-quiz-template",
+	events: {
+		"click .quiz-submit": "checkAnswer",
+		"keyup .quiz-guess": "submitAnswerOnEnter"
+	},
+
 	render: function() {
 		BaseView.prototype.render.call(this);
 		if(this.model.get("isMCQ")) {
@@ -56,9 +72,49 @@ var QuizView = BaseView.extend({
 		var self = this;
 		choices.forEach(function(c) {
 			var view = new ChoiceView({model: c});
+			self.choices.push(view);
 			self.$el.find(".choices").append(view.$el);
 		});
+	},
+	checkAnswer: function(evt) {
+		var i;
+		var attempt = {};
+		if(!this.model.get("isMCQ")) {
+			attempt.guess = $.trim(this.$el.find(".quiz-guess").val());
+			attempt.result = (attempt.guess === String(this.model.get("answer")));
+		}
+		else {
+			attempt = this.checkMCQAnswer();
+		}
+		console.log(attempt);
+		this.model.addAttempt(attempt);
+	},
+
+	checkMCQAnswer: function() {
+		var result = true;
+		var guesses = "";
+		var data;
+		for(i = 0; i<this.choices.length; i++) {
+			data = this.choices[i].checkAnswer();
+			if(data.guess) {
+				guesses += data.guess + ";";
+			}
+			if(!data.result) {
+				result = false;
+			}
+		}
+		return {
+			result: result,
+			guess: guesses
+		}
+
+	},
+	submitAnswerOnEnter: function(evt) {
+		if(evt.keyCode == 13) {
+			this.checkAnswer();
+		}
 	}
+
 });
 
 var QuizListView = ListView.extend({
@@ -98,6 +154,14 @@ var Quiz = Backbone.Model.extend({
 		this.choices = new ChoiceCollection(attrs.choices, {parse:true});
 		delete attrs.choices;
 		return attrs;
+	},
+	addAttempt: function(attempt) {
+		var attempt = new Attempt(attempt);
+		this.attempts.add(attempt);
+		if(attempt.result) {
+			this.set("answered", true);
+		}
+		//attempt.save();
 	}
 });
 

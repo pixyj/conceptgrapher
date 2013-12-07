@@ -7,9 +7,19 @@
 	<a href="/{{ topic.slug }}/{{ concept.slug }}/">{{ concept.name }}</a>
 </h2>
 
-
-<div id="quiz-list">
+<div id="content-wrapper" class="container">
+	<div id="quiz-list">
+	</div>
 </div>
+
+<div id="sidebar-wrapper" class="container">
+   <ul class="nav">
+     <li class="active"><a href="#resources">Resources</a></li>
+     <li><a href="#">Quizzes</a></li>
+     <li><a href="#">Attempts</a></li>
+     <li><a href="#">Stats</a></li>
+   </ul>
+ </div>
 
 {% endblock %}
 
@@ -20,16 +30,20 @@
 {% block templates %}
 <script type="text/html" id="single-quiz-template">
 	<h3> <%= question %> </h3>
+	
 	<% if(isMCQ) { %>
 		<div class="choices">
 		</div>
 	<% } else { %>
 		<div class="row">
 		<div class="col-lg-2">
-			<input type="text" class="form-control"/>
+			<input type="text" class="form-control quiz-guess" >
 		</div>
 		</div>
 	<% } %>
+	<br/>
+	<button class="quiz-submit btn btn-primary">Submit</button>
+
 </script>
 
 <script type="text/html" id="choice-template">
@@ -40,9 +54,9 @@
 	        <input type="checkbox" id="choice-<%= cid %>">
 	      </span>
 	      <label for="choice-<%= cid %>" class="form-control"> <%= text %> </label>
-	    </div><!-- /input-group -->
-	  </div><!-- /.col-lg-4 -->
-	</div><!-- /.row -->
+	    </div>
+	  </div>
+	</div>
 </script>
 
 
