@@ -4,20 +4,16 @@ from django.db import models
 from pagedown.widgets import AdminPagedownWidget
 
 
-from .models import Quiz, Choice
-from topo.models import ConceptQuiz
-
+from .models import Quiz, Choice, QuizAttempt
 
 class ChoiceInline(admin.StackedInline):
 	model = Choice
 	extra = 2
 
-class ConceptQuestionInline(admin.StackedInline):
-	model = ConceptQuiz
-	extra = 0
+
 
 class QuizAdmin(admin.ModelAdmin):
-	inlines = [ChoiceInline, ConceptQuestionInline]
+	inlines = [ChoiceInline]
 	formfield_overrides = {
 	    models.TextField: {'widget': AdminPagedownWidget },
 	}
@@ -25,6 +21,8 @@ class QuizAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Quiz, QuizAdmin)
+
+admin.site.register(QuizAttempt)
 
 from django.contrib import admin
 

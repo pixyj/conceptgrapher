@@ -42,7 +42,7 @@ INSTALLED_APPS = (
     'uber',
     'topo',
     'quiz',
-    'quant',
+    'front',
     
 )
 

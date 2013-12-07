@@ -18,3 +18,10 @@ class QuizSerializer(ModelSerializer):
 		attrs['choices'] = choices
 		return attrs
 
+
+class QuizAttemptSerializer(ModelSerializer):
+
+	class Meta:
+		fields = ['created', 'guess', 'result']
+
+	

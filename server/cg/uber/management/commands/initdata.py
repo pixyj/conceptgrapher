@@ -1,11 +1,11 @@
 from django.core.management.base import BaseCommand, CommandError
-from uber import load_data
+from uber import data
 
 class Command(BaseCommand):
 	help = "loaddata for dev"
 
 	def handle(self, *args, **kwargs):
-		load_data.load_all()
+		data.load_all()
 		self.stdout.write("Done")
 
 
