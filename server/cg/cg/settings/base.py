@@ -43,7 +43,6 @@ INSTALLED_APPS = (
     'topo',
     'quiz',
     'quant',
-    'ang',
     
 )
 

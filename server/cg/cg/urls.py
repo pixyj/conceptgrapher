@@ -9,5 +9,5 @@ urlpatterns = patterns('',
     url(r'^api/quant/', include('quant.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'', include('ang.urls')),
 )
+
