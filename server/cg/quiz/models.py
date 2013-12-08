@@ -19,7 +19,7 @@ class Quiz(TimestampedModel):
 		return attrs
 
 	def to_dict_with_session_attempts(self, session_key):
-		attrs = self.to_dict()
+		attrs = self.to_dict_with_filter(AnonQuizAttempt, session_key=session_key)
 		attrs['attempts'] = []
 		return attrs
 

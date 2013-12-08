@@ -1,3 +1,7 @@
+var App = {
+
+}
+
 var BaseView = Backbone.View.extend({
 	initialize: function() {
 		this.$compileTemplate();
@@ -18,6 +22,9 @@ var BaseView = Backbone.View.extend({
 	render: function() {
 		var html = this.compiledTemplate(this.model.toJSON());
 		this.$el.html(html);
+	},
+	afterRender: function() {
+		//Any focus stuff
 	}
 });
 
@@ -52,7 +59,7 @@ var ChoiceView = BaseView.extend({
 		}
 		return store;
 	}
-})
+});
 
 var QuizView = BaseView.extend({
 	template: "#single-quiz-template",
@@ -65,7 +72,12 @@ var QuizView = BaseView.extend({
 		BaseView.prototype.render.call(this);
 		if(this.model.get("isMCQ")) {
 			this.renderChoices(this.model.choices.models);
+		} else {
+
 		}
+	},
+	afterRender: function() {
+		this.$el.find(".quiz-guess").focus();
 	},
 	renderChoices:function(choices) {
 		this.choices = [];
@@ -88,6 +100,9 @@ var QuizView = BaseView.extend({
 		}
 		console.log(attempt);
 		this.model.addAttempt(attempt);
+		if(attempt.result) {
+			this.options.parent.showNext(this.model);	
+		}
 	},
 
 	checkMCQAnswer: function() {
@@ -117,9 +132,56 @@ var QuizView = BaseView.extend({
 
 });
 
-var QuizListView = ListView.extend({
-	SingleView: QuizView
+var QuizSnippetView = BaseView.extend({
+	template: "#quiz-snippet-template",
+	tagName: "tr"
 });
+
+var QuizListView = ListView.extend({
+	SingleView: QuizSnippetView,
+	tagName: "tbody"
+});
+
+var QuizContainerView = Backbone.View.extend({
+	el: "#quiz-container-view",
+	initialize: function() {
+		this.listView = new QuizListView({collection: this.collection});
+		this.$el.find("table").html(this.listView.$el);
+	},
+	showNext:function(model) {
+		this.setNowViewByIndex(model.get("index") + 1);
+	},
+	setNowViewById: function(id) {
+		var model = this.collection.get(id);
+		if(!model) {
+			this.allDone();
+			return;
+		}
+		if(this.nowView) {
+			this.nowView.unbind();
+			this.nowView.remove();
+			delete this.nowView;
+		}
+		this.nowView = new QuizView({
+		model: model,
+		parent: this
+		});
+		$("#quiz-now").html(this.nowView.$el);
+		this.nowView.afterRender();
+		App.router.navigate("quiz/" + model.get("id"));
+	},
+	setNowViewByIndex: function(index) {
+		var model = this.collection.at(index);
+		if(!model) {
+			this.allDone();
+			return;
+		}
+		this.setNowViewById(model.get("id"));
+	},
+	allDone: function() {
+
+	}
+})
 
 
 var Choice = Backbone.Model.extend({
@@ -161,20 +223,49 @@ var Quiz = Backbone.Model.extend({
 		if(attempt.result) {
 			this.set("answered", true);
 		}
-		//attempt.save();
 	}
 });
 
 
 var QuizCollection = Backbone.Collection.extend({
-	model: Quiz
+	model: Quiz,
+	parse: function(models) {
+		var i = 0;
+		models.forEach(function(m) {
+			m.index = i;
+			i += 1;
+		});
+		return models;
+	}
+});
+
+var AppRouter = Backbone.Router.extend({
+	routes: {
+		"quiz/:id": "setQuiz",
+		"": "setFirstQuiz"
+	},
+	constructor: function(options) {
+		this.options = options;
+		Backbone.Router.call(this, options);
+	},
+	setQuiz: function(id) {
+		console.log(id);
+		this.options.view.setNowViewById(id);
+	},
+	setFirstQuiz: function() {
+		var id = this.options.view.collection.at(0).get("id");
+		this.navigate("#quiz/" + id, {trigger: true});
+	}
 });
 
 var init = function() {
 	qc = new QuizCollection();
 	qc.add(quizData, {parse: true});
-	qv = new QuizListView({collection: qc})
-	$("#quiz-list").append(qv.$el);
+
+	v = new QuizContainerView({collection: qc});
+
+	App.router = new AppRouter({view: v});
+	Backbone.history.start();
 }
 
 $(document).ready(init);

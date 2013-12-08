@@ -13,7 +13,8 @@ def render_concept(request, topic_slug, concept_slug):
 		user = request.user
 		attrs = [quiz.to_dict_with_user_attempts(user) for quiz in quizzes]
 	else:
-		attrs = [quiz.to_dict_with_session_attempts() for quiz in quizzes]
+		attrs = [quiz.to_dict_with_session_attempts(request.session.session_key) 
+				for quiz in quizzes]
 
 
 	json_attrs = simplejson.dumps(attrs)	

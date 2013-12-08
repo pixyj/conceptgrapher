@@ -8,16 +8,27 @@
 </h2>
 
 <div id="content-wrapper" class="container">
-	<div id="quiz-list">
+	<div id="quiz-container-view">
+		<div id="quiz-list">
+			<table class="table table-striped">
+				<thead>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<div id="quiz-now">
+		</div>
 	</div>
 </div>
+
 
 <div id="sidebar-wrapper" class="container">
    <ul class="nav">
      <li class="active"><a href="#resources">Resources</a></li>
      <li><a href="#">Quizzes</a></li>
      <li><a href="#">Attempts</a></li>
-     <li><a href="#">Stats</a></li>
+     <li><a href="#stats">Stats</a></li>
    </ul>
  </div>
 
@@ -28,6 +39,13 @@
 {% endblock %}
 
 {% block templates %}
+
+
+<script type="text/html" id="quiz-snippet-template">
+		<td><a href="#quiz/<%= id %>"><%= question %> </a></td>
+</script>
+
+
 <script type="text/html" id="single-quiz-template">
 	<h3> <%= question %> </h3>
 	
@@ -36,8 +54,8 @@
 		</div>
 	<% } else { %>
 		<div class="row">
-		<div class="col-lg-2">
-			<input type="text" class="form-control quiz-guess" >
+		<div class="col-lg-4">
+			<input type="text" class="quiz-guess form-control">
 		</div>
 		</div>
 	<% } %>
@@ -48,7 +66,7 @@
 
 <script type="text/html" id="choice-template">
 	<div class="row choice-row">
-	  <div class="col-lg-4">
+	  <div class="col-lg-6">
 	    <div class="input-group">
 	      <span class="input-group-addon">
 	        <input type="checkbox" id="choice-<%= cid %>">

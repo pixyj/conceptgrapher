@@ -3,7 +3,7 @@ from uber.serializers import ModelSerializer
 class QuizSerializer(ModelSerializer):
 
 	class Meta:
-		fields = ['question', 'answer']
+		fields = ['id', 'question', 'answer']
 
 
 	def to_dict(self, model):

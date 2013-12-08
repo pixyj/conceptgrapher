@@ -1,3 +1,7 @@
+pre {
+	width: 60%;
+}
+
 #container {
 	margin-left: 2%;
 }
@@ -14,9 +18,16 @@
 	float: left;
 	width: 18%;
 	margin-right: 2%;
-	background-color: 
 }
 
-pre {
+#quiz-list {
+	float: right;
+	width: 20%;
+	margin-right: 10%;
+
+}
+
+#quiz-now {
+	float: left;
 	width: 60%;
 }
