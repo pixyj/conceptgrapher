@@ -31,3 +31,7 @@ pre {
 	float: left;
 	width: 60%;
 }
+
+.quiz-submit {
+	margin-bottom: 10px;
+}

@@ -17,20 +17,31 @@ var ChoiceView = BaseView.extend({
 	}
 });
 
+var BasicAttemptView = BaseView.extend({
+	tagName: "tr",
+	template: "#quiz-basic-attempt-template"
+});
+
+var BasicAttemptListView = ListView.extend({
+	SingleView: BasicAttemptView
+});
+
 var QuizView = BaseView.extend({
 	template: "#single-quiz-template",
 	events: {
 		"click .quiz-submit": "checkAnswer",
 		"keyup .quiz-guess": "submitAnswerOnEnter"
 	},
-
 	render: function() {
 		BaseView.prototype.render.call(this);
 		if(this.model.get("isMCQ")) {
 			this.renderChoices(this.model.choices.models);
-		} else {
-
 		}
+		this.attemptListView = new BasicAttemptListView({
+			collection: this.model.attempts,
+			el: this.$el.find("tbody")
+		});
+		this.attemptListView.render();
 	},
 	afterRender: function() {
 		this.$el.find(".quiz-guess").focus();
@@ -101,6 +112,7 @@ var QuizListView = ListView.extend({
 
 var QuizContainerView = BaseView.extend({
 	template: "#quiz-container-template",
+	navLi: "#quiz-li",
 	init: function() {
 		this.listView = new QuizListView({collection: this.collection});
 	},
@@ -109,6 +121,7 @@ var QuizContainerView = BaseView.extend({
 		this.$el.html(html);
 		this.listView.render();
 		this.$el.find("table").html(this.listView.$el);
+		this.afterRender();
 	},
 	showNext:function(model) {
 		this.setNowViewByIndex(model.get("index") + 1);
@@ -144,7 +157,9 @@ var QuizContainerView = BaseView.extend({
 	allDone: function() {
 
 	}
-})
+});
+
+_.extend(QuizContainerView.prototype, ContainerMixin);
 
 
 var Choice = Backbone.Model.extend({
@@ -166,14 +181,14 @@ var AttemptCollection = Backbone.Collection.extend({
 	model: Attempt
 });
 
-var mk = new Markdown.Converter();
+App.mk = new Markdown.Converter();
 
 var Quiz = Backbone.Model.extend({
 	parse: function(attrs) {
 		console.log(attrs);
 		this.attempts = new AttemptCollection(attrs.attempts)
 		delete attrs.attempts;
-		attrs.question = mk.makeHtml(attrs.question);
+		attrs.question = App.mk.makeHtml(attrs.question);
 		attrs.isMCQ = attrs.choices.length !== 0;
 
 		this.choices = new ChoiceCollection(attrs.choices, {parse:true});
@@ -206,7 +221,8 @@ var AppRouter = Backbone.Router.extend({
 	routes: {
 		"quiz/:id": "setQuiz",
 		"": "setFirstQuiz",
-		"resources": "setResources"
+		"resources": "setResources",
+		"stats": "showStats"
 	},
 	constructor: function(options) {
 		this.options = options;
@@ -240,23 +256,25 @@ var AppRouter = Backbone.Router.extend({
 	setResources: function() {
 		this.setCurrentView("resources");
 
+	},
+	showStats: function() {
+
 	}
 
 });
 
 var initResources = function() {
-	resources = new ConceptResourceCollection();
+	var resources = new ConceptResourceCollection();
 	resources.conceptId = conceptId;
-	resourceView = new ConceptResourceListView({collection: resources});
 	resources.fetch();
-	return resourceView;
+	return resources
 }
 
 var init = function() {
 	qc = new QuizCollection();
 	qc.add(quizData, {parse: true});
 
-	initResources();
+	resources = initResources();
 	var views = {
 		quiz: {
 			constructor: QuizContainerView,

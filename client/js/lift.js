@@ -17,9 +17,18 @@ var BaseView = Backbone.View.extend({
 	render: function() {
 		var html = this.compiledTemplate(this.model.toJSON());
 		this.$el.html(html);
+		this.afterRender();
 	},
 	afterRender: function() {
 		//Any focus stuff
+	},
+	remove: function() {
+		this.cleanup();
+		this.unbind();
+		Backbone.View.prototype.remove.call(this);
+	},
+	cleanup: function() {
+
 	}
 });
 
@@ -39,5 +48,20 @@ var ListView = BaseView.extend({
 		this.collection.models.forEach(function(m) {
 			self.addView(m);
 		});
+		this.afterRender();
 	}
 });
+
+var ContainerMixin = {
+	afterRender: function() {
+		var navLi = $(this.navLi);
+		if(!navLi.length) {
+			console.error("Error");
+		}
+		navLi.addClass("active");
+	},
+	cleanup: function() {
+		$(this.navLi).removeClass("active");
+	}			
+}
+

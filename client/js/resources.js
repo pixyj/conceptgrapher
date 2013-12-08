@@ -5,8 +5,11 @@ var ConceptResourceView = BaseView.extend({
 
 var ConceptResourceListView = ListView.extend({
 	tagName: "ul",
-	SingleView: ConceptResourceView
+	SingleView: ConceptResourceView,
+	navLi: "#resources-li"
 });
+
+_.extend(ConceptResourceListView.prototype, ContainerMixin);
 
 var ConceptResource = Backbone.Model.extend({
 
