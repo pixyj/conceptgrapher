@@ -2,50 +2,6 @@ var App = {
 
 }
 
-var BaseView = Backbone.View.extend({
-	initialize: function() {
-		this.$compileTemplate();
-		this.init();
-		this.render();
-	},
-	$compileTemplate: function() {
-		if(this.template) {
-			if(!$(this.template).length) {
-				console.error("Invalid template", this.template);
-			}
-			this.compiledTemplate = _.template($(this.template).html());			
-		}
-	},
-	init: function() {
-		//console.log("init: implement in subclass if needed");
-	},
-	render: function() {
-		var html = this.compiledTemplate(this.model.toJSON());
-		this.$el.html(html);
-	},
-	afterRender: function() {
-		//Any focus stuff
-	}
-});
-
-var ListView = BaseView.extend({
-	init: function() {
-		this.collection.on("add", this.addView, this);
-		this.views = [];
-	},
-	addView: function(model) {
-		var view = new this.SingleView({model: model});
-		this.views.push(view);
-		this.$el.append(view.$el);
-	},
-	render: function() {
-		var self = this;
-		this.collection.models.forEach(function(m) {
-			self.addView(m);
-		});
-	}
-});
-
 var ChoiceView = BaseView.extend({
 	template: "#choice-template",
 	checkAnswer: function() {
@@ -247,6 +203,7 @@ var AppRouter = Backbone.Router.extend({
 	constructor: function(options) {
 		this.options = options;
 		Backbone.Router.call(this, options);
+		this.currentView = undefined;
 	},
 	setQuiz: function(id) {
 		console.log(id);
@@ -266,6 +223,7 @@ var init = function() {
 
 	App.router = new AppRouter({view: v});
 	Backbone.history.start();
+	initResources();
 }
 
 $(document).ready(init);

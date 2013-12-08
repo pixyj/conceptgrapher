@@ -36,6 +36,7 @@
 
 {% block js_objects %}
 	quizData = {{ json_attrs | safe }}
+	conceptId = {{ concept.id }}
 {% endblock %}
 
 {% block templates %}
@@ -77,11 +78,16 @@
 	</div>
 </script>
 
+{% include "resources.html" %}
 
 {% endblock %}
 
 
+
+
 {% block js %}
 	<script type="text/javascript" src="{{ STATIC_URL }}js/lib/Markdown.Converter.js"> </script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/resources.js"> </script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/quiz.js"> </script>
+
 {% endblock %}
