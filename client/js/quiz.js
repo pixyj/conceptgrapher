@@ -40,6 +40,7 @@ var QuizView = BaseView.extend({
 		var self = this;
 		choices.forEach(function(c) {
 			var view = new ChoiceView({model: c});
+			view.render();
 			self.choices.push(view);
 			self.$el.find(".choices").append(view.$el);
 		});
@@ -98,10 +99,15 @@ var QuizListView = ListView.extend({
 	tagName: "tbody"
 });
 
-var QuizContainerView = Backbone.View.extend({
-	el: "#quiz-container-view",
-	initialize: function() {
+var QuizContainerView = BaseView.extend({
+	template: "#quiz-container-template",
+	init: function() {
 		this.listView = new QuizListView({collection: this.collection});
+	},
+	render: function() {
+		var html = this.compiledTemplate({});
+		this.$el.html(html);
+		this.listView.render();
 		this.$el.find("table").html(this.listView.$el);
 	},
 	showNext:function(model) {
@@ -122,6 +128,7 @@ var QuizContainerView = Backbone.View.extend({
 		model: model,
 		parent: this
 		});
+		this.nowView.render();
 		$("#quiz-now").html(this.nowView.$el);
 		this.nowView.afterRender();
 		App.router.navigate("quiz/" + model.get("id"));
@@ -198,32 +205,75 @@ var QuizCollection = Backbone.Collection.extend({
 var AppRouter = Backbone.Router.extend({
 	routes: {
 		"quiz/:id": "setQuiz",
-		"": "setFirstQuiz"
+		"": "setFirstQuiz",
+		"resources": "setResources"
 	},
 	constructor: function(options) {
 		this.options = options;
 		Backbone.Router.call(this, options);
 		this.currentView = undefined;
 	},
-	setQuiz: function(id) {
-		console.log(id);
-		this.options.view.setNowViewById(id);
+
+	setCurrentView: function(view) {
+		var obj = this.options.views[view];
+		if(this.currentView) {
+			if(obj.constructor === this.currentView.constructor) {
+				return; //View already current;
+			}
+			this.currentView.remove();
+			this.currentView.unbind();
+		}
+		this.currentView = new obj.constructor(obj.options);
+		this.currentView.render();
+		$("#content-wrapper").html(this.currentView.$el);
+		return this.currentView;
 	},
-	setFirstQuiz: function() {
-		var id = this.options.view.collection.at(0).get("id");
-		this.navigate("#quiz/" + id, {trigger: true});
+
+	setFirstQuiz: function() {	
+		var view = this.setCurrentView("quiz");
+		view.setNowViewByIndex(0);
+	},
+	setQuiz: function(id) {
+		this.setCurrentView("quiz");
+		this.currentView.setNowViewById(id);
+	},
+	setResources: function() {
+		this.setCurrentView("resources");
+
 	}
+
 });
+
+var initResources = function() {
+	resources = new ConceptResourceCollection();
+	resources.conceptId = conceptId;
+	resourceView = new ConceptResourceListView({collection: resources});
+	resources.fetch();
+	return resourceView;
+}
 
 var init = function() {
 	qc = new QuizCollection();
 	qc.add(quizData, {parse: true});
 
-	v = new QuizContainerView({collection: qc});
-
-	App.router = new AppRouter({view: v});
-	Backbone.history.start();
 	initResources();
+	var views = {
+		quiz: {
+			constructor: QuizContainerView,
+			options: {
+				collection: qc
+			} 
+		},
+		resources: {
+			constructor: ConceptResourceListView,
+			options: {
+				collection: resources
+			}
+		}
+	}
+
+	App.router = new AppRouter({views: views});
+	Backbone.history.start();
 }
 
 $(document).ready(init);

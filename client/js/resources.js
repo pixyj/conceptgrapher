@@ -4,7 +4,7 @@ var ConceptResourceView = BaseView.extend({
 });
 
 var ConceptResourceListView = ListView.extend({
-	el: "#resources-list",
+	tagName: "ul",
 	SingleView: ConceptResourceView
 });
 
@@ -22,11 +22,4 @@ var ConceptResourceCollection = Backbone.Collection.extend({
 	}
 });
 
-var initResources = function() {
-	resources = new ConceptResourceCollection();
-	resources.conceptId = conceptId;
-	resourceView = new ConceptResourceListView({collection: resources});
-	resources.fetch();
-	return resourceView;
-}
 

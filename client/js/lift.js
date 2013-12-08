@@ -2,7 +2,6 @@ var BaseView = Backbone.View.extend({
 	initialize: function() {
 		this.$compileTemplate();
 		this.init();
-		this.render();
 	},
 	$compileTemplate: function() {
 		if(this.template) {
@@ -32,6 +31,7 @@ var ListView = BaseView.extend({
 	addView: function(model) {
 		var view = new this.SingleView({model: model});
 		this.views.push(view);
+		view.render();
 		this.$el.append(view.$el);
 	},
 	render: function() {

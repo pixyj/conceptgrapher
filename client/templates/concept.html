@@ -8,18 +8,7 @@
 </h2>
 
 <div id="content-wrapper" class="container">
-	<div id="quiz-container-view">
-		<div id="quiz-list">
-			<table class="table table-striped">
-				<thead>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
-		</div>
-		<div id="quiz-now">
-		</div>
-	</div>
+
 </div>
 
 
@@ -41,6 +30,20 @@
 
 {% block templates %}
 
+<script type="text/html" id="quiz-container-template">
+	<div id="quiz-container-view">
+		<div id="quiz-list">
+			<table class="table table-striped">
+				<thead>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<div id="quiz-now">
+		</div>
+	</div>
+</script>
 
 <script type="text/html" id="quiz-snippet-template">
 		<td><a href="#quiz/<%= id %>"><%= question %> </a></td>
