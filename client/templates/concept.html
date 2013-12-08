@@ -22,10 +22,12 @@
 
 {% endblock %}
 
+<!-- Objects initialized by server before pageLoad -->
 {% block js_objects %}
 	quizData = {{ json_attrs | safe }}
 	conceptId = {{ concept.id }}
 {% endblock %}
+
 
 {% block templates %}
 
@@ -82,6 +84,7 @@
 
 </script>
 
+
 <script type="text/html" id="choice-template">
 	<div class="row choice-row">
 	  <div class="col-lg-6">
@@ -96,6 +99,7 @@
 </script>
 
 {% include "resources.html" %}
+{% include "attempts.html" %}
 
 {% endblock %}
 

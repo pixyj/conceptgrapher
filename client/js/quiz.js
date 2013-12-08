@@ -1,6 +1,13 @@
+/******************************************************************************
+*App -> Container object. 
+******************************************************************************/
 var App = {
 
 }
+
+/******************************************************************************
+*	Views -> More ParentViews, see lift.js
+******************************************************************************/
 
 var ChoiceView = BaseView.extend({
 	template: "#choice-template",
@@ -161,6 +168,41 @@ var QuizContainerView = BaseView.extend({
 
 _.extend(QuizContainerView.prototype, ContainerMixin);
 
+/******************************************************************************
+	STATS
+******************************************************************************/
+
+var AttemptDetailedView = BaseView.extend({
+	template: "#attempt-detailed-single-view",
+	tagName: "tr"
+});
+
+var AttemptDetailedTableView = TableView.extend({
+	columns: ['Quiz', 'Guess', 'Result'],
+	SingleView: AttemptDetailedView,
+	afterRender: function() {
+		this.$el.addClass("table table-striped table-bordered");
+	}
+});
+
+var StatsContainerView = BaseView.extend({
+	navLi: "#stats-li",
+	init: function() {
+		this.attempts = new AttemptDetailedTableView({
+			collection: this.collection.detailedAttemptCollection
+		});
+	},
+	render: function() {
+		this.attempts.render();
+		this.$el.append(this.attempts.$el);
+	}
+});
+_.extend(StatsContainerView.prototype, ContainerMixin);
+
+
+/******************************************************************************
+* Models and Collections
+******************************************************************************/
 
 var Choice = Backbone.Model.extend({
 	parse: function(attrs) {
@@ -174,11 +216,27 @@ var ChoiceCollection = Backbone.Collection.extend({
 });
 
 var Attempt = Backbone.Model.extend({
-
+	parse: function(attrs) {
+		if(!attrs.created) {
+			attrs.created = new Date();
+		}
+		else {
+			attrs.created = new Date(attrs.created);
+		}
+		return attrs;
+	}
 });
 
 var AttemptCollection = Backbone.Collection.extend({
 	model: Attempt
+});
+
+var DetailedAttempt = Backbone.Model.extend({
+
+});
+
+var DetailedAttemptCollection = Backbone.Collection.extend({
+	model: DetailedAttempt
 });
 
 App.mk = new Markdown.Converter();
@@ -196,14 +254,13 @@ var Quiz = Backbone.Model.extend({
 		return attrs;
 	},
 	addAttempt: function(attempt) {
-		var attempt = new Attempt(attempt);
+		var attempt = new Attempt(attempt, {parse: true});
 		this.attempts.add(attempt);
 		if(attempt.result) {
 			this.set("answered", true);
 		}
-	}
+	},
 });
-
 
 var QuizCollection = Backbone.Collection.extend({
 	model: Quiz,
@@ -214,9 +271,33 @@ var QuizCollection = Backbone.Collection.extend({
 			i += 1;
 		});
 		return models;
+	},
+	initialize: function() {
+		this.detailedAttemptCollection = new DetailedAttemptCollection();
+		this.on("add", this.listenToQuizAttempts, this);
+
+	},
+	listenToQuizAttempts: function(quiz) {
+		var self = this;
+		quiz.attempts.on("add", function(attempt) {
+			self.createDetailedAttempt(quiz, attempt);
+		});
+		quiz.attempts.forEach(function(m) {
+			self.createDetailedAttempt(quiz, m);
+		})
+	},
+	createDetailedAttempt: function(quiz, attempt) {
+		var attrs = attempt.toJSON();
+		attrs.question = quiz.get("question");
+		attrs.quizId = quiz.get("id");
+		var detailed = new DetailedAttempt(attrs);
+		this.detailedAttemptCollection.add(detailed);
 	}
 });
 
+/******************************************************************************
+* Router and Initialization
+******************************************************************************/
 var AppRouter = Backbone.Router.extend({
 	routes: {
 		"quiz/:id": "setQuiz",
@@ -258,7 +339,7 @@ var AppRouter = Backbone.Router.extend({
 
 	},
 	showStats: function() {
-
+		this.setCurrentView("stats");
 	}
 
 });
@@ -269,6 +350,7 @@ var initResources = function() {
 	resources.fetch();
 	return resources
 }
+
 
 var init = function() {
 	qc = new QuizCollection();
@@ -287,8 +369,14 @@ var init = function() {
 			options: {
 				collection: resources
 			}
+		},
+		stats: {
+			constructor: StatsContainerView,
+			options: {
+				collection: qc
+			}
 		}
-	}
+	};
 
 	App.router = new AppRouter({views: views});
 	Backbone.history.start();

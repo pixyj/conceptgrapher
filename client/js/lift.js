@@ -15,8 +15,11 @@ var BaseView = Backbone.View.extend({
 		//console.log("init: implement in subclass if needed");
 	},
 	render: function() {
-		var html = this.compiledTemplate(this.model.toJSON());
-		this.$el.html(html);
+		var html;
+		if(this.model) {
+			html = this.compiledTemplate(this.model.toJSON());			
+			this.$el.html(html);
+		}
 		this.afterRender();
 	},
 	afterRender: function() {
@@ -37,10 +40,14 @@ var ListView = BaseView.extend({
 		this.collection.on("add", this.addView, this);
 		this.views = [];
 	},
-	addView: function(model) {
+	renderSingleView: function(model) {
 		var view = new this.SingleView({model: model});
 		this.views.push(view);
 		view.render();
+		return view;
+	},
+	addView: function(model) {
+		var view = this.renderSingleView(model);
 		this.$el.append(view.$el);
 	},
 	render: function() {
@@ -49,6 +56,25 @@ var ListView = BaseView.extend({
 			self.addView(m);
 		});
 		this.afterRender();
+	}
+});
+
+var TableView = ListView.extend({
+	tagName: "table",
+	columns: [],
+	render: function() {
+		var head = $("<thead>");
+		this.columns.forEach(function(c) {
+			head.append($("<th>").html(c))
+		});
+		this.tbody = $("<tbody>");
+		this.$el.append(head);
+		this.$el.append(this.tbody);
+		ListView.prototype.render.call(this);
+	},
+	addView: function(model) {
+		var view = this.renderSingleView(model);
+		this.tbody.append(view.$el);
 	}
 });
 
