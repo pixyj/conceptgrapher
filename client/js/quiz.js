@@ -52,6 +52,7 @@ var QuizView = BaseView.extend({
 	},
 	afterRender: function() {
 		this.$el.find(".quiz-guess").focus();
+		window.scrollTo(0, 0);
 	},
 	renderChoices:function(choices) {
 		this.choices = [];
@@ -168,6 +169,10 @@ var QuizContainerView = BaseView.extend({
 
 _.extend(QuizContainerView.prototype, ContainerMixin);
 
+var AggregateStatsView = BaseView.extend({
+	el: ""
+});
+
 /******************************************************************************
 	STATS
 ******************************************************************************/
@@ -181,7 +186,7 @@ var AttemptDetailedTableView = TableView.extend({
 	columns: ['Quiz', 'Guess', 'Result'],
 	SingleView: AttemptDetailedView,
 	afterRender: function() {
-		this.$el.addClass("table table-striped table-bordered");
+		this.$el.addClass("table table-striped table-bordered table-hover");
 	}
 });
 
@@ -195,6 +200,7 @@ var StatsContainerView = BaseView.extend({
 	render: function() {
 		this.attempts.render();
 		this.$el.append(this.attempts.$el);
+		this.afterRender();
 	}
 });
 _.extend(StatsContainerView.prototype, ContainerMixin);
@@ -232,18 +238,54 @@ var AttemptCollection = Backbone.Collection.extend({
 });
 
 var DetailedAttempt = Backbone.Model.extend({
-
 });
 
+var AggregateStats = Backbone.Model.extend({
+	defaults: {
+		correctAttempts: 0,
+		wrongAttempts: 0,
+		totalQuizzes: 0
+	},
+	initialize: function(options) {
+		this.options = options;
+		this.options.collection.on("add", this.update, this);
+
+	},
+	getTotalAttempts: function() {
+		return this.correctAttempts + this.wrongAttempts;
+	},
+	getProgress: function() {
+		var totalQuizzes = this.options.quizModels.length;
+		if(totalQuizzes === 0) {
+			return 0;
+		}
+		return this.get("correctAttempts") / totalQuizzes;
+	},
+	update: function(attempt) {
+		attempt = attempt.toJSON();
+		if(attempt.result) {
+			this.incr("correctAttempts");
+		} else {
+			this.incr("wrongAttempts");
+		}
+	}
+});
+_.extend(AggregateStats.prototype, UpdateModelMixin);
+
 var DetailedAttemptCollection = Backbone.Collection.extend({
-	model: DetailedAttempt
+	model: DetailedAttempt,
+	initialize: function(models, options) {
+		this.aggregateStats = new AggregateStats({
+			collection: this, 
+			quizModels: options.quizCollection.models
+		});
+	}
 });
 
 App.mk = new Markdown.Converter();
 
 var Quiz = Backbone.Model.extend({
 	parse: function(attrs) {
-		console.log(attrs);
 		this.attempts = new AttemptCollection(attrs.attempts)
 		delete attrs.attempts;
 		attrs.question = App.mk.makeHtml(attrs.question);
@@ -273,7 +315,9 @@ var QuizCollection = Backbone.Collection.extend({
 		return models;
 	},
 	initialize: function() {
-		this.detailedAttemptCollection = new DetailedAttemptCollection();
+		this.detailedAttemptCollection = new DetailedAttemptCollection([], {
+			quizCollection: this
+		});
 		this.on("add", this.listenToQuizAttempts, this);
 
 	},
@@ -290,8 +334,7 @@ var QuizCollection = Backbone.Collection.extend({
 		var attrs = attempt.toJSON();
 		attrs.question = quiz.get("question");
 		attrs.quizId = quiz.get("id");
-		var detailed = new DetailedAttempt(attrs);
-		this.detailedAttemptCollection.add(detailed);
+		this.detailedAttemptCollection.add(attrs, {parse: true});
 	}
 });
 
@@ -323,6 +366,7 @@ var AppRouter = Backbone.Router.extend({
 		this.currentView = new obj.constructor(obj.options);
 		this.currentView.render();
 		$("#content-wrapper").html(this.currentView.$el);
+		window.scrollTo(0, 0);
 		return this.currentView;
 	},
 
@@ -354,8 +398,7 @@ var initResources = function() {
 
 var init = function() {
 	qc = new QuizCollection();
-	qc.add(quizData, {parse: true});
-
+	
 	resources = initResources();
 	var views = {
 		quiz: {
@@ -377,7 +420,7 @@ var init = function() {
 			}
 		}
 	};
-
+	qc.add(quizData, {parse: true});
 	App.router = new AppRouter({views: views});
 	Backbone.history.start();
 }

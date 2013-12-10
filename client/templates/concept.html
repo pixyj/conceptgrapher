@@ -1,11 +1,17 @@
 {% extends "base.html" %}
 
+{% block css %}
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/concept.css">
+{% endblock %}
+
+{% block current-path %}
+	<li> <a href="/{{ topic.slug }}/">{{ topic.name }}</a>
+	<li> <a href="/{{ topic.slug }}/{{ concept.slug }}/">{{ concept.name }}</a> </li>
+{% endblock %}
+
 {% block content %}
 
-<h2>
-	<a href="/{{ topic.slug }}/">{{ topic.name }}</a> - 
-	<a href="/{{ topic.slug }}/{{ concept.slug }}/">{{ concept.name }}</a>
-</h2>
+<div id="main-wrapper">
 
 <div id="content-wrapper" class="container">
 
@@ -19,6 +25,8 @@
      <li id="stats-li"><a href="#stats">Stats</a></li>
    </ul>
  </div>
+
+</div>
 
 {% endblock %}
 
@@ -58,7 +66,7 @@
 
 
 <script type="text/html" id="single-quiz-template">
-	<h3> <%= question %> </h3>
+	<h3 class="quiz-question"> <%= question %> </h3>
 	
 	<% if(isMCQ) { %>
 		<div class="choices">

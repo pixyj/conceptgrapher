@@ -64,9 +64,11 @@ var TableView = ListView.extend({
 	columns: [],
 	render: function() {
 		var head = $("<thead>");
+		var headRow = $("<tr>");
 		this.columns.forEach(function(c) {
-			head.append($("<th>").html(c))
+			headRow.append($("<th>").html(c))
 		});
+		$(head).append(headRow);
 		this.tbody = $("<tbody>");
 		this.$el.append(head);
 		this.$el.append(this.tbody);
@@ -91,3 +93,17 @@ var ContainerMixin = {
 	}			
 }
 
+var UpdateModelMixin = {
+	incr: function(attr, by) {
+		by = by || 1;
+		var old = this.get(attr);
+		this.set(attr, old + by);
+		return this;
+	},
+	decr: function(attr, by) {
+		by = by || 1;
+		var old = this.get(attr);
+		this.set(attr, old - by);
+		return this;
+	}
+}

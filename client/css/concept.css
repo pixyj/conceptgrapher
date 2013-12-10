@@ -1,13 +1,8 @@
-pre {
-	width: 60%;
-}
-
-#container {
-	margin-left: 2%;
-}
 .choice-row {
 	margin-top: 0.5%;
 }
+
+
 
 #main-wrapper {
 	margin-top: 5%;
@@ -29,6 +24,10 @@ pre {
 	width: 20%;
 	margin-right: 10%;
 
+}
+
+.quiz-question {
+	border-bottom: yellow;
 }
 
 #quiz-now {
