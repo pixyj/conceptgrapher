@@ -3,7 +3,7 @@ import networkx as nx
 import redis
 
 REDIS_KEYS = {
-	"top_sorted": "graph:top_sorted",
+	"top_sorted_list": "graph:top_sorted_list",
 	"full": "graph:full"
 }
 
@@ -11,7 +11,7 @@ def initialize_graph():
 	build_graph([])
 
 def delete_graph():
-	client = redis.Redis()
+	client = redis.StrictRedis()
 	for graph_key, redis_key in REDIS_KEYS.iteritems():
 		client.delete(redis_key)
 
@@ -62,9 +62,25 @@ def top_sort_and_store(dg):
 	"""
 	
 	top_sorted_concepts = nx.topological_sort(dg)
-	redis_client = redis.Redis()
-	redis_client.set(REDIS_KEYS["top_sorted"], simplejson.dumps(top_sorted_concepts))
+	client = redis.StrictRedis()
+	pipeline = client.pipeline()
+	pipeline.set(REDIS_KEYS["top_sorted_list"], simplejson.dumps(top_sorted_concepts))
+	pipeline.execute()
+	return dg
 
+def get_top_sorted_concept_id_list():
+	client = redis.StrictRedis()
+	json_ids = client.get(REDIS_KEYS['top_sorted_list'])
+	return simplejson.loads(json_ids)
+
+def get_top_sorted_concept_id_dict():
+	client = redis.StrictRedis()
+	json_data = client.get(REDIS_KEYS['top_sorted_list'])
+	concept_list = simplejson.loads(json_data)
+	concept_dict = {}
+	for index, pk in enumerate(concept_list):
+		concept_dict[pk] = index
+	return concept_dict
 
 def load_modify_dump(fn):
 	"""

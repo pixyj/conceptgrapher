@@ -151,7 +151,8 @@ var QuizContainerView = BaseView.extend({
 		this.afterRender();
 	},
 	showNext:function(model) {
-		this.setNowViewByIndex(model.get("index") + 1);
+		this.showNextUnanswered(model);
+		//this.setNowViewByIndex(model.get("index") + 1);
 	},
 	setNowViewById: function(id) {
 		var model = this.collection.get(id);
@@ -181,6 +182,20 @@ var QuizContainerView = BaseView.extend({
 		}
 		this.setNowViewById(model.get("id"));
 	},
+	showNextUnanswered: function() {
+		var length = this.collection.models.length;
+		var i, model;
+		for(i = 0; i < length; i++) {
+			model = this.collection.at(i);
+			if(model.get("answered") === false) {
+				this.setNowViewById(model.get("id"));
+				return;
+			}
+		}
+		App.router.navigate("#done", {trigger: true});
+
+	},
+
 	allDone: function() {
 
 	}
@@ -224,6 +239,13 @@ var StatsContainerView = BaseView.extend({
 });
 _.extend(StatsContainerView.prototype, ContainerMixin);
 
+
+/******************************************************************************
+* Done!
+******************************************************************************/
+var DoneView = BaseView.extend({
+	template: "#done-template"
+});
 
 /******************************************************************************
 * Models and Collections
@@ -272,7 +294,7 @@ var AggregateStats = Backbone.Model.extend({
 	initialize: function(options) {
 		this.options = options;
 		this.options.collection.on("add", this.update, this);
-
+		this.on("change:progress", this.onProgressCompleted, this);
 	},
 	getTotalAttempts: function() {
 		return this.correctAttempts + this.wrongAttempts;
@@ -295,6 +317,16 @@ var AggregateStats = Backbone.Model.extend({
 			this.incr("wrongAttempts");
 		}
 		this.updateProgress();
+	},
+	onProgressCompleted: function() {
+		if(App.isIniting) {
+			return;
+		}
+
+		if(this.get("progress") != 1) {
+			return;
+		}
+		App.router.navigate("#done", {trigger: true});
 	}
 });
 _.extend(AggregateStats.prototype, UpdateModelMixin);
@@ -367,6 +399,17 @@ var QuizCollection = Backbone.Collection.extend({
 	}
 });
 
+var NextConcept = Backbone.Model.extend({
+	url: function() {
+		return "/api/topo/concept/" + this.get("conceptId") + "/next"
+	},
+	parse: function(attrs) {
+		attrs.url = "/" + this.get("topicSlug") + "/" + attrs.slug + "/"
+		return attrs;
+	}
+
+});
+
 /******************************************************************************
 * Router and Initialization
 ******************************************************************************/
@@ -375,8 +418,10 @@ var AppRouter = Backbone.Router.extend({
 		"quiz/:id": "setQuiz",
 		"": "setFirstQuiz",
 		"resources": "setResources",
-		"stats": "showStats"
+		"stats": "showStats",
+		"done": "showDone"
 	},
+
 	constructor: function(options) {
 		this.options = options;
 		Backbone.Router.call(this, options);
@@ -401,7 +446,7 @@ var AppRouter = Backbone.Router.extend({
 
 	setFirstQuiz: function() {	
 		var view = this.setCurrentView("quiz");
-		view.setNowViewByIndex(0);
+		view.showNextUnanswered();
 	},
 	setQuiz: function(id) {
 		this.setCurrentView("quiz");
@@ -413,6 +458,9 @@ var AppRouter = Backbone.Router.extend({
 	},
 	showStats: function() {
 		this.setCurrentView("stats");
+	},
+	showDone: function() {
+		this.setCurrentView("done");
 	}
 
 });
@@ -426,9 +474,11 @@ var initResources = function() {
 
 
 var init = function() {
+	App.isIniting = true;
 	qc = new QuizCollection();
-	
 	resources = initResources();
+	App.nextConcept = new NextConcept({topicSlug: topicSlug, conceptId: conceptId});
+	App.nextConcept.fetch();
 	var views = {
 		quiz: {
 			constructor: QuizContainerView,
@@ -447,6 +497,12 @@ var init = function() {
 			options: {
 				collection: qc
 			}
+		},
+		done: {
+			constructor: DoneView,
+			options: {
+				model: App.nextConcept
+			}
 		}
 	};
 	qc.add(quizData, {parse: true});
@@ -455,6 +511,8 @@ var init = function() {
 
 	progressView = new ConceptProgressView({model: qc.detailedAttemptCollection.aggregateStats});
 	progressView.render();
+
+	App.isIniting = false;
 
 }
 

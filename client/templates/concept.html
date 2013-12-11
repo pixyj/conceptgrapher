@@ -40,6 +40,7 @@
 {% block js_objects %}
 	quizData = {{ json_attrs | safe }}
 	conceptId = {{ concept.id }}
+	topicSlug = "{{ topic.slug }}"
 {% endblock %}
 
 
@@ -132,6 +133,14 @@
 	      <label for="choice-<%= cid %>" class="form-control"> <%= text %> </label>
 	    </div>
 	  </div>
+	</div>
+</script>
+
+<script type="text/html" id="done-template">
+	<div>
+	<h2> Congratulations! You have answered all questions correctly </h2>
+	<h2> Up Next: </h2>
+	<h2> <a href="<%= url %>"> <%= name %> </a></h2>
 	</div>
 </script>
 

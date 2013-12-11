@@ -1,6 +1,7 @@
 from django.db import models
 from uber.models import SluggedTimeStampedModel, TimestampedModel
 
+from .graph import get_top_sorted_concept_id_dict
 
 class Topic(SluggedTimeStampedModel):
 	name = models.CharField(max_length=128, unique=True)
@@ -8,8 +9,27 @@ class Topic(SluggedTimeStampedModel):
 	def to_be_slugged(self):
 		return self.name	
 
+
+	def get_top_sorted_concepts(self):
+		concepts = [concept for concept in self.concept_set.all()]
+		top_sorted_concepts = get_top_sorted_concept_id_dict()
+
+		def compare(one, two):
+			one = one.id
+			two = two.id
+			if top_sorted_concepts[one] < top_sorted_concepts[two]:
+				return -1
+			else:
+				return 1
+			
+		concepts.sort(cmp=compare)
+		return concepts
+
+
 	def __unicode__(self):
 		return self.name
+
+
 
 
 class Concept(SluggedTimeStampedModel):

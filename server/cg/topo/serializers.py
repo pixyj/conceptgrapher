@@ -15,4 +15,7 @@ class ConceptQuizSerializer(ModelSerializer):
 		return attrs
 
 
+class ConceptSerializer(ModelSerializer):
+	class Meta:
+		fields = ['id', 'name', 'slug']
 

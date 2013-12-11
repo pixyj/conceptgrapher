@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+	
+{% block content %}
+In the order of learning:
+{% for concept in concepts %}
+	<li>
+		<h3><a href="{{ concept.slug }}/"> {{ concept.name }} </a></h3>
+	</li>
+{% endfor %}
+
+{% endblock %}
+

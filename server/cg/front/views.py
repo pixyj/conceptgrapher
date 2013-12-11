@@ -22,3 +22,8 @@ def render_concept(request, topic_slug, concept_slug):
 		{"json_attrs": json_attrs, "topic": topic, "concept": concept})
 
 
+
+def render_topic(request, topic_slug):
+	topic = get_object_or_404(Topic, slug=topic_slug)
+	concepts = topic.get_top_sorted_concepts()
+	return render(request, "topic.html", {"concepts": concepts, "topic": topic})
