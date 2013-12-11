@@ -13,6 +13,10 @@
 
 <div id="main-wrapper">
 
+	<div class="progress progress-striped" id="concept-progress">
+	    <div class="progress-bar progress-bar-success"></div>
+	</div>
+
 <div id="content-wrapper" class="container">
 
 </div>
@@ -27,6 +31,8 @@
  </div>
 
 </div>
+
+
 
 {% endblock %}
 
@@ -103,6 +109,7 @@
 	 <a href="#resources" class="quiz-review"> Oops.. Wrong answer. Review.</a>
 	</span>
 
+
 	<table class="table table-striped table-bordered">
 		<thead>
 		<th>Guess</th>
@@ -138,6 +145,8 @@
 
 {% block js %}
 	<script type="text/javascript" src="{{ STATIC_URL }}js/lib/Markdown.Converter.js"> </script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/lib/bootstrap-progressbar.js"> </script>
+
 	<script type="text/javascript" src="{{ STATIC_URL }}js/resources.js"> </script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/quiz.js"> </script>
 

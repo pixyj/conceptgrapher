@@ -183,8 +183,8 @@ var QuizContainerView = BaseView.extend({
 
 _.extend(QuizContainerView.prototype, ContainerMixin);
 
-var AggregateStatsView = BaseView.extend({
-	el: ""
+var ConceptProgressView = ProgressBaseView.extend({
+	progressAttr: "progress" 
 });
 
 /******************************************************************************
@@ -258,7 +258,8 @@ var AggregateStats = Backbone.Model.extend({
 	defaults: {
 		correctAttempts: 0,
 		wrongAttempts: 0,
-		totalQuizzes: 0
+		totalQuizzes: 0,
+		progress: 0
 	},
 	initialize: function(options) {
 		this.options = options;
@@ -268,13 +269,16 @@ var AggregateStats = Backbone.Model.extend({
 	getTotalAttempts: function() {
 		return this.correctAttempts + this.wrongAttempts;
 	},
-	getProgress: function() {
+	updateProgress: function() {
 		var totalQuizzes = this.options.quizModels.length;
 		if(totalQuizzes === 0) {
 			return 0;
 		}
-		return this.get("correctAttempts") / totalQuizzes;
+		var progress = this.get("correctAttempts") / totalQuizzes;
+		this.set("progress", progress);
+		return progress;
 	},
+
 	update: function(attempt) {
 		attempt = attempt.toJSON();
 		if(attempt.result) {
@@ -282,6 +286,7 @@ var AggregateStats = Backbone.Model.extend({
 		} else {
 			this.incr("wrongAttempts");
 		}
+		this.updateProgress();
 	}
 });
 _.extend(AggregateStats.prototype, UpdateModelMixin);
@@ -438,6 +443,10 @@ var init = function() {
 	qc.add(quizData, {parse: true});
 	App.router = new AppRouter({views: views});
 	Backbone.history.start();
+
+	progressView = new ConceptProgressView({model: qc.detailedAttemptCollection.aggregateStats});
+	progressView.render();
+
 }
 
 $(document).ready(init);

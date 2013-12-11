@@ -5,37 +5,3 @@ pre {
 #container {
 	margin-left: 2%;
 }
-.choice-row {
-	margin-top: 0.5%;
-}
-
-#main-wrapper {
-	margin-top: 5%;
-}
-
-#content-wrapper {
-	float: right;
-	width: 80%;
-}
-
-#sidebar-wrapper {
-	float: left;
-	width: 13%;
-	margin-right: 2%;
-}
-
-#quiz-list {
-	float: right;
-	width: 20%;
-	margin-right: 10%;
-
-}
-
-#quiz-now {
-	float: left;
-	width: 60%;
-}
-
-.quiz-submit {
-	margin-bottom: 10px;
-}

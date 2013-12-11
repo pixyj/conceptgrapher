@@ -107,3 +107,16 @@ var UpdateModelMixin = {
 		return this;
 	}
 }
+
+var ProgressBaseView = Backbone.View.extend({
+	initialize: function() {
+		var changeEvent = "change:" + this.progressAttr;
+		this.model.on(changeEvent, this.render, this);
+	},
+	render: function() {
+		var progress = this.model.get(this.progressAttr);
+		progress *= 100;
+		var progressPercentage = progress + "%";
+		$('.progress .progress-bar').css("width", progressPercentage);
+	}
+});
