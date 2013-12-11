@@ -85,15 +85,17 @@ var QuizView = BaseView.extend({
 		var result = true;
 		var guesses = "";
 		var data;
-		for(i = 0; i<this.choices.length; i++) {
+		var length = this.choices.length;
+		for(i = 0; i<length; i++) {
 			data = this.choices[i].checkAnswer();
 			if(data.guess) {
-				guesses += data.guess + ";";
+				guesses += data.guess + ", ";
 			}
 			if(!data.result) {
 				result = false;
 			}
 		}
+		guesses = guesses.slice(0, guesses.length - 2);
 		return {
 			result: result,
 			guess: guesses
