@@ -7,12 +7,12 @@ from quiz.models import Quiz
 def render_concept(request, topic_slug, concept_slug):
 	topic = get_object_or_404(Topic, slug=topic_slug)
 	concept = get_object_or_404(Concept, topic=topic, slug=concept_slug)
-	
 	quizzes = Quiz.objects.filter(concept=concept).all()
 	if request.user.is_authenticated():
 		user = request.user
 		attrs = [quiz.to_dict_with_user_attempts(user) for quiz in quizzes]
 	else:
+
 		attrs = [quiz.to_dict_with_session_attempts(request.session.session_key) 
 				for quiz in quizzes]
 

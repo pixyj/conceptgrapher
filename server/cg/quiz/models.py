@@ -20,7 +20,6 @@ class Quiz(TimestampedModel):
 
 	def to_dict_with_session_attempts(self, session_key):
 		attrs = self.to_dict_with_filter(AnonQuizAttempt, session_key=session_key)
-		attrs['attempts'] = []
 		return attrs
 
 	def to_dict_with_filter(self, klass, **kwargs):
@@ -62,6 +61,7 @@ class BaseQuizAttempt(models.Model):
 	def to_dict(self):
 		return QuizAttemptSerializer().to_dict(self)
 
+
 	class Meta:
 		abstract = True
 
@@ -86,3 +86,37 @@ class AnonQuizAttempt(BaseQuizAttempt):
 		unique_together = (
 			("quiz", "session_key", "guess"), #For logged in users
 		)
+
+
+
+class BaseConceptProgress(models.Model):
+	"""
+	Attempt Aggregatation to measure skill level.
+	Instead of counting attempts to measure each time, 
+	progress is cached here
+	"""
+	concept = models.ForeignKey(Concept)
+	progress = models.FloatField()
+
+	def __unicode__(self):
+		"{}'s progress in {}: ".format(self.get_user(), self.concept, self.progress)
+
+
+	class Meta:
+		abstract = True
+
+
+class UserConceptProgress(models.Model):
+	user = models.ForeignKey(User)
+
+	def get_user(self):
+		return self.user
+
+
+class AnonConceptProgress(models.Model):
+	session_key = models.CharField(max_length=40)
+
+	def get_user(self):
+		return self.session_key
+
+

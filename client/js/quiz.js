@@ -55,6 +55,7 @@ var QuizView = BaseView.extend({
 		window.scrollTo(0, 0);
 		this.$el.find(".quiz-guess").focus();
 		this.$el.find(".quiz-wrong-submit").hide();
+		this.setQuizGuessStatus();
 	},
 	renderChoices:function(choices) {
 		this.choices = [];
@@ -68,6 +69,9 @@ var QuizView = BaseView.extend({
 	},
 	showNext: function(evt) {
 		this.options.parent.showNext(this.model);
+	},
+	setQuizGuessStatus: function() {
+		this.$el.find(".quiz-guess").attr("disabled", this.model.get("answered"));
 	},
 
 	checkAnswer: function(evt) {
@@ -88,6 +92,7 @@ var QuizView = BaseView.extend({
 		else {
 			this.$el.find(".quiz-wrong-submit").show();
 		}
+		this.setQuizGuessStatus();
 	},
 
 	checkMCQAnswer: function() {
@@ -244,6 +249,9 @@ var Attempt = Backbone.Model.extend({
 			attrs.created = new Date(attrs.created);
 		}
 		return attrs;
+	},
+	url: function() {
+		return "/api/quiz/attempt/create/"
 	}
 });
 
@@ -318,9 +326,10 @@ var Quiz = Backbone.Model.extend({
 		if(attempt.result) {
 			this.set("answered", true);
 		}
+		attempt.quizId = this.get("id");
 		attempt = new Attempt(attempt, {parse: true});
 		this.attempts.add(attempt);
-
+		attempt.save();
 	},
 });
 

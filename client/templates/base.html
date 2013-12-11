@@ -49,6 +49,8 @@
 		<script type="text/javascript" src="{{ STATIC_URL }}js/lib/backbone.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}js/lift.js"></script>
 
+		<script type="text/javascript" src="{{ STATIC_URL }}js/lib/csrf.js"></script>
+
 
 		{% block templates %}
 		{% endblock %}
@@ -57,6 +59,8 @@
 		{% endblock %}
 
 	</div>	
+
+	{% csrf_token %}
 
 	</body>
 </html>
