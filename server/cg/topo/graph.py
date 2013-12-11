@@ -73,10 +73,13 @@ def get_top_sorted_concept_id_list():
 	json_ids = client.get(REDIS_KEYS['top_sorted_list'])
 	return simplejson.loads(json_ids)
 
-def get_top_sorted_concept_id_dict():
-	client = redis.StrictRedis()
-	json_data = client.get(REDIS_KEYS['top_sorted_list'])
-	concept_list = simplejson.loads(json_data)
+def get_top_sorted_concept_id_dict(**kwargs):
+	concept_list = kwargs.get("concept_list")
+	if not concept_list:
+		client = redis.StrictRedis()
+		json_data = client.get(REDIS_KEYS['top_sorted_list'])
+		concept_list = simplejson.loads(json_data)
+
 	concept_dict = {}
 	for index, pk in enumerate(concept_list):
 		concept_dict[pk] = index
