@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from topo.models import Topic, Concept
 from quiz.models import Quiz
 
+from quiz.diagnose import get_serialized_quizzes_by_topic
 
 def render_concept(request, topic_slug, concept_slug):
 	topic = get_object_or_404(Topic, slug=topic_slug)
@@ -26,4 +27,9 @@ def render_concept(request, topic_slug, concept_slug):
 def render_topic(request, topic_slug):
 	topic = get_object_or_404(Topic, slug=topic_slug)
 	concepts = topic.get_top_sorted_concepts()
-	return render(request, "topic.html", {"concepts": concepts, "topic": topic})
+	concepts_with_quizzes = get_serialized_quizzes_by_topic(topic)
+	return render(request, "topic.html", {
+		"concepts": concepts, "topic": topic, 
+		"concepts_with_quizzes": concepts_with_quizzes
+	})
+

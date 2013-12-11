@@ -10,3 +10,8 @@ In the order of learning:
 
 {% endblock %}
 
+
+{% block js_objects %}
+	conceptsPlusQuizzes = {{ concepts_with_quizzes | safe }}
+{%endblock %}
+
