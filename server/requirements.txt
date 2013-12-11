@@ -3,4 +3,5 @@ networkx==1.8.1
 simplejson
 django-pagedown
 redis
+django-redis
 

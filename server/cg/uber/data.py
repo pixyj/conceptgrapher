@@ -16,7 +16,8 @@ def load_all():
 	graph.initialize_graph()	
 	models = ['Auth']
 	models += ['Topic', 'Concept', 'ConceptRelationship', 'ConceptResource']
-	models += ['Quiz', 'Choice', 'UserQuizAttempt', 'AnonQuizAttempt']
+	models += ['Quiz', 'Choice'] 
+	#models += ['UserQuizAttempt', 'AnonQuizAttempt']
 	
 
 	for m in models:

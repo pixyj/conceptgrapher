@@ -1,5 +1,6 @@
 from django.db import models
 from uber.models import SluggedTimeStampedModel, TimestampedModel
+from uber.cache import cache_key_for
 
 from .graph import get_top_sorted_concept_id_dict
 
@@ -8,8 +9,7 @@ class Topic(SluggedTimeStampedModel):
 
 	def to_be_slugged(self):
 		return self.name	
-
-
+	
 	def get_top_sorted_concepts(self):
 		concepts = [concept for concept in self.concept_set.all()]
 		top_sorted_concepts = get_top_sorted_concept_id_dict()
