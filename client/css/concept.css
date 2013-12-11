@@ -27,7 +27,7 @@
 }
 
 .quiz-question {
-	border-bottom: yellow;
+	font-size: 1.75em;
 }
 
 #quiz-now {
@@ -35,9 +35,11 @@
 	width: 60%;
 }
 
-.quiz-submit {
+.quiz-action {
 	margin-bottom: 10px;
 }
+
+
 
 .label-answered {
 	font-size: 15px;

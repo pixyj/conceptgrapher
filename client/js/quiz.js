@@ -37,7 +37,8 @@ var QuizView = BaseView.extend({
 	template: "#single-quiz-template",
 	events: {
 		"click .quiz-submit": "checkAnswer",
-		"keyup .quiz-guess": "submitAnswerOnEnter"
+		"keyup .quiz-guess": "submitAnswerOnEnter",
+		"click .quiz-next": "showNext"
 	},
 	render: function() {
 		BaseView.prototype.render.call(this);
@@ -51,8 +52,9 @@ var QuizView = BaseView.extend({
 		this.attemptListView.render();
 	},
 	afterRender: function() {
-		this.$el.find(".quiz-guess").focus();
 		window.scrollTo(0, 0);
+		this.$el.find(".quiz-guess").focus();
+		this.$el.find(".quiz-wrong-submit").hide();
 	},
 	renderChoices:function(choices) {
 		this.choices = [];
@@ -64,6 +66,10 @@ var QuizView = BaseView.extend({
 			self.$el.find(".choices").append(view.$el);
 		});
 	},
+	showNext: function(evt) {
+		this.options.parent.showNext(this.model);
+	},
+
 	checkAnswer: function(evt) {
 		var i;
 		var attempt = {};
@@ -78,6 +84,9 @@ var QuizView = BaseView.extend({
 		this.model.addAttempt(attempt);
 		if(attempt.result) {
 			this.options.parent.showNext(this.model);	
+		}
+		else {
+			this.$el.find(".quiz-wrong-submit").show();
 		}
 	},
 
