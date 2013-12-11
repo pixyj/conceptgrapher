@@ -28,6 +28,7 @@ class Quiz(TimestampedModel):
 		attempts = klass.objects.filter(**kwargs).filter(quiz=self).all()
 		attempts = [attempt.to_dict() for attempt in attempts]
 		attrs['attempts'] = attempts
+		attrs['answered'] = False #Initialization. Will be overriden if answered
 		for attempt in attempts:
 			if attempt['result']:
 				attrs['answered'] = True

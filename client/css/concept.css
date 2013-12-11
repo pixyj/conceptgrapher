@@ -38,3 +38,7 @@
 .quiz-submit {
 	margin-bottom: 10px;
 }
+
+.label-answered {
+	font-size: 15px;
+}

@@ -112,7 +112,10 @@ var QuizView = BaseView.extend({
 
 var QuizSnippetView = BaseView.extend({
 	template: "#quiz-snippet-template",
-	tagName: "tr"
+	tagName: "tr",
+	init: function() {
+		this.model.on("change:answered", this.render, this);
+	}
 });
 
 var QuizListView = ListView.extend({
@@ -298,11 +301,12 @@ var Quiz = Backbone.Model.extend({
 		return attrs;
 	},
 	addAttempt: function(attempt) {
-		var attempt = new Attempt(attempt, {parse: true});
-		this.attempts.add(attempt);
 		if(attempt.result) {
 			this.set("answered", true);
 		}
+		attempt = new Attempt(attempt, {parse: true});
+		this.attempts.add(attempt);
+
 	},
 });
 

@@ -55,6 +55,11 @@
 </script>
 
 <script type="text/html" id="quiz-snippet-template">
+		<td> 
+		<% if(answered) { %>
+			<span class="label label-success label-answered">✓</span>
+		<% } %>
+		</td>
 		<td><a href="#quiz/<%= id %>"><%= question %> </a></td>
 </script>
 
