@@ -11,6 +11,7 @@ admin.site.register(Topic)
 admin.site.register(ConceptRelationship)
 
 
+
 class ConceptAdmin(admin.ModelAdmin):
 	inlines = [ConceptResourceInline]
 	prepopulated_fields = {"slug": ("name",)}
