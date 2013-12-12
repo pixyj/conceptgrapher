@@ -1,11 +1,4 @@
 /******************************************************************************
-*App -> Container object. 
-******************************************************************************/
-var App = {
-
-}
-
-/******************************************************************************
 *	Views -> More ParentViews, see lift.js
 ******************************************************************************/
 
@@ -247,167 +240,111 @@ var DoneView = BaseView.extend({
 	template: "#done-template"
 });
 
+
 /******************************************************************************
-* Models and Collections
+* Router and Initialization
 ******************************************************************************/
-
-var Choice = Backbone.Model.extend({
-	parse: function(attrs) {
-		attrs.cid = this.cid;
-		return attrs;
-	}
-});
-
-var ChoiceCollection = Backbone.Collection.extend({
-	model: Choice
-});
-
-var Attempt = Backbone.Model.extend({
-	parse: function(attrs) {
-		if(!attrs.created) {
-			attrs.created = new Date();
-		}
-		else {
-			attrs.created = new Date(attrs.created);
-		}
-		return attrs;
+var AppRouter = Backbone.Router.extend({
+	routes: {
+		"quiz/:id": "setQuiz",
+		"": "setFirstQuiz",
+		"resources": "setResources",
+		"stats": "showStats",
+		"done": "showDone"
 	},
-	url: function() {
-		return "/api/quiz/attempt/create/"
-	}
-});
 
-var AttemptCollection = Backbone.Collection.extend({
-	model: Attempt
-});
-
-var DetailedAttempt = Backbone.Model.extend({
-});
-
-var AggregateStats = Backbone.Model.extend({
-	defaults: {
-		correctAttempts: 0,
-		wrongAttempts: 0,
-		totalQuizzes: 0,
-		progress: 0
-	},
-	initialize: function(options) {
+	constructor: function(options) {
 		this.options = options;
-		this.options.collection.on("add", this.update, this);
-		this.on("change:progress", this.onProgressCompleted, this);
+		Backbone.Router.call(this, options);
+		this.currentView = undefined;
 	},
-	getTotalAttempts: function() {
-		return this.correctAttempts + this.wrongAttempts;
-	},
-	updateProgress: function() {
-		var totalQuizzes = this.options.quizModels.length;
-		if(totalQuizzes === 0) {
-			return 0;
+
+	setCurrentView: function(view) {
+		var obj = this.options.views[view];
+		if(this.currentView) {
+			if(obj.constructor === this.currentView.constructor) {
+				return; //View already current;
+			}
+			this.currentView.remove();
+			this.currentView.unbind();
 		}
-		var progress = this.get("correctAttempts") / totalQuizzes;
-		this.set("progress", progress);
-		return progress;
+		this.currentView = new obj.constructor(obj.options);
+		this.currentView.render();
+		$("#content-wrapper").html(this.currentView.$el);
+		window.scrollTo(0, 0);
+		return this.currentView;
 	},
 
-	update: function(attempt) {
-		attempt = attempt.toJSON();
-		if(attempt.result) {
-			this.incr("correctAttempts");
-		} else {
-			this.incr("wrongAttempts");
-		}
-		this.updateProgress();
+	setFirstQuiz: function() {	
+		var view = this.setCurrentView("quiz");
+		view.showNextUnanswered();
 	},
-	onProgressCompleted: function() {
-		if(App.isIniting) {
-			return;
-		}
-
-		if(this.get("progress") != 1) {
-			return;
-		}
-		App.router.navigate("#done", {trigger: true});
-	}
-});
-_.extend(AggregateStats.prototype, UpdateModelMixin);
-
-var DetailedAttemptCollection = Backbone.Collection.extend({
-	model: DetailedAttempt,
-	initialize: function(models, options) {
-		this.aggregateStats = new AggregateStats({
-			collection: this, 
-			quizModels: options.quizCollection.models
-		});
-	}
-});
-
-App.mk = new Markdown.Converter();
-
-var Quiz = Backbone.Model.extend({
-	parse: function(attrs) {
-		this.attempts = new AttemptCollection(attrs.attempts)
-		delete attrs.attempts;
-		attrs.question = App.mk.makeHtml(attrs.question);
-		attrs.isMCQ = attrs.choices.length !== 0;
-
-		this.choices = new ChoiceCollection(attrs.choices, {parse:true});
-		delete attrs.choices;
-		return attrs;
+	setQuiz: function(id) {
+		this.setCurrentView("quiz");
+		this.currentView.setNowViewById(id);
 	},
-	addAttempt: function(attempt) {
-		if(attempt.result) {
-			this.set("answered", true);
-		}
-		attempt.quizId = this.get("id");
-		attempt = new Attempt(attempt, {parse: true});
-		this.attempts.add(attempt);
-		attempt.save();
-	},
-});
-
-var QuizCollection = Backbone.Collection.extend({
-	model: Quiz,
-	parse: function(models) {
-		var i = 0;
-		models.forEach(function(m) {
-			m.index = i;
-			i += 1;
-		});
-		return models;
-	},
-	initialize: function() {
-		this.detailedAttemptCollection = new DetailedAttemptCollection([], {
-			quizCollection: this
-		});
-		this.on("add", this.listenToQuizAttempts, this);
+	setResources: function() {
+		this.setCurrentView("resources");
 
 	},
-	listenToQuizAttempts: function(quiz) {
-		var self = this;
-		quiz.attempts.on("add", function(attempt) {
-			self.createDetailedAttempt(quiz, attempt);
-		});
-		quiz.attempts.forEach(function(m) {
-			self.createDetailedAttempt(quiz, m);
-		})
+	showStats: function() {
+		this.setCurrentView("stats");
 	},
-	createDetailedAttempt: function(quiz, attempt) {
-		var attrs = attempt.toJSON();
-		attrs.question = quiz.get("question");
-		attrs.quizId = quiz.get("id");
-		this.detailedAttemptCollection.add(attrs, {parse: true});
-	}
-});
-
-var NextConcept = Backbone.Model.extend({
-	url: function() {
-		return "/api/topo/concept/" + this.get("conceptId") + "/next"
-	},
-	parse: function(attrs) {
-		attrs.url = "/" + this.get("topicSlug") + "/" + attrs.slug + "/"
-		return attrs;
+	showDone: function() {
+		this.setCurrentView("done");
 	}
 
 });
 
+var initResources = function() {
+	var resources = new ConceptResourceCollection();
+	resources.conceptId = conceptId;
+	resources.fetch();
+	return resources
+}
 
+
+var init = function() {
+	App.isIniting = true;
+	qc = new QuizCollection();
+	resources = initResources();
+	App.nextConcept = new NextConcept({topicSlug: topicSlug, conceptId: conceptId});
+	App.nextConcept.fetch();
+	var views = {
+		quiz: {
+			constructor: QuizContainerView,
+			options: {
+				collection: qc
+			} 
+		},
+		resources: {
+			constructor: ConceptResourceListView,
+			options: {
+				collection: resources
+			}
+		},
+		stats: {
+			constructor: StatsContainerView,
+			options: {
+				collection: qc
+			}
+		},
+		done: {
+			constructor: DoneView,
+			options: {
+				model: App.nextConcept
+			}
+		}
+	};
+	qc.add(quizData, {parse: true});
+	App.router = new AppRouter({views: views});
+	Backbone.history.start();
+
+	progressView = new ConceptProgressView({model: qc.detailedAttemptCollection.aggregateStats});
+	progressView.render();
+
+	App.isIniting = false;
+
+}
+
+$(document).ready(init);
