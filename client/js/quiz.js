@@ -84,7 +84,8 @@ var AggregateStats = Backbone.Model.extend({
 		if(this.get("progress") != 1) {
 			return;
 		}
-		App.router.navigate("#done", {trigger: true});
+		Backbone.trigger("quizzes:completed");
+		
 	}
 });
 _.extend(AggregateStats.prototype, UpdateModelMixin);
@@ -122,6 +123,9 @@ var Quiz = Backbone.Model.extend({
 		this.attempts.add(attempt);
 		attempt.save();
 	},
+	isAttempted: function() {
+		return this.attempts.length > 0;
+	}
 });
 
 var QuizCollection = Backbone.Collection.extend({
@@ -169,19 +173,4 @@ var NextConcept = Backbone.Model.extend({
 
 });
 
-
-
-var ConceptPlusQuizzes = Backbone.Model.extend({
-	parse: function(attrs) {
-		var x = 1;
-		this.quizzes = new QuizCollection();
-		this.quizzes.add(attrs.quizzes, {parse: true});
-		delete attrs.quizzes;
-		return attrs;
-	}
-});
-
-var ConceptPlusCollection = Backbone.Collection.extend({
-	model: ConceptPlusQuizzes
-});
 

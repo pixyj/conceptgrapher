@@ -343,7 +343,14 @@ var init = function() {
 	progressView = new ConceptProgressView({model: qc.detailedAttemptCollection.aggregateStats});
 	progressView.render();
 
+	Backbone.on("quizzes:completed", function() {
+		App.router.navigate("#done", {trigger: true});	
+	});
+	
+
 	App.isIniting = false;
+
+
 
 }
 
