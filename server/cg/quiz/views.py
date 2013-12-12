@@ -39,8 +39,6 @@ def create_attempt(request):
 	#import pdb;pdb.set_trace()	
 	topic_id = quiz.concept.topic.id
 	set_topic_as_attempted(user_cache_key, topic_id)	
-
-
 	return HttpResponse("OK")
 
 

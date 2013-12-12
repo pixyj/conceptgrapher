@@ -61,80 +61,6 @@
 	</div>
 </script>
 
-<script type="text/html" id="quiz-snippet-template">
-		<td> 
-		<% if(answered) { %>
-			<span class="label label-success label-answered">✓</span>
-		<% } %>
-		</td>
-		<td><a href="#quiz/<%= id %>"><%= question %> </a></td>
-</script>
-
-<script type="text/html" id="quiz-basic-attempt-template">
-		<td><%= guess %></td>
-		<td><%= result %></td>
-</script>
-
-
-
-<script type="text/html" id="single-quiz-template">
-	
-	<div class="quiz-question"> 
-	<% if(answered) { %>
-		<span class="label label-success label-answered">✓</span>
-	<% } %>
-	<div>
-	<%= question %> 
-	</div>
-	
-	<% if(isMCQ) { %>
-		<div class="choices">
-		</div>
-	<% } else { %>
-		<div class="row">
-		<div class="col-lg-4">
-			<input type="text" class="quiz-guess form-control">
-		</div>
-		</div>
-	<% } %>
-	<br/>
-	<% if(!answered) { %>
-		<button class="quiz-action quiz-submit btn btn-primary">Submit</button>
-
-	<% }  else { %>
-		<button class="quiz-action quiz-next btn btn-default">Next</button>
-	<% }  %>
-	<br/>
-
-	<span class="quiz-wrong-submit">
-	 <a href="#resources" class="quiz-review"> Oops.. Wrong answer. Review.</a>
-	</span>
-
-
-	<table class="table table-striped table-bordered">
-		<thead>
-		<th>Guess</th>
-		<th>Result</th>
-		</thead>
-		<tbody>
-		</tbody>
-	</table>
-
-</script>
-
-
-<script type="text/html" id="choice-template">
-	<div class="row choice-row">
-	  <div class="col-lg-6">
-	    <div class="input-group">
-	      <span class="input-group-addon">
-	        <input type="checkbox" id="choice-<%= cid %>">
-	      </span>
-	      <label for="choice-<%= cid %>" class="form-control"> <%= text %> </label>
-	    </div>
-	  </div>
-	</div>
-</script>
 
 <script type="text/html" id="done-template">
 	<div>
@@ -144,6 +70,7 @@
 	</div>
 </script>
 
+{% include "quiz-templates.html" %}
 {% include "resources.html" %}
 {% include "attempts.html" %}
 
@@ -153,12 +80,9 @@
 
 
 {% block js %}
-	<script type="text/javascript" src="{{ STATIC_URL }}js/lib/Markdown.Converter.js"> </script>
-	<script type="text/javascript" src="{{ STATIC_URL }}js/lib/bootstrap-progressbar.js"> </script>
-
-	<script type="text/javascript" src="{{ STATIC_URL }}js/resources.js"> </script>
-	<script type="text/javascript" src="{{ STATIC_URL }}js/quiz.js"> </script>
+	{% include "quiz-js.html" %}
 	<script type="text/javascript" src="{{ STATIC_URL }}js/concept-page.js"> </script>
-
-
 {% endblock %}
+
+
+

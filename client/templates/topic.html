@@ -15,3 +15,16 @@ In the order of learning:
 	conceptsPlusQuizzes = {{ concepts_with_quizzes | safe }}
 {%endblock %}
 
+{% block templates %}
+	{% include "quiz-templates.html" %}
+{% endblock %}
+
+
+
+{% block js %}
+	{% include "quiz-js.html" %}
+	<script type="text/javascript" src="{{ STATIC_URL }}js/diagnose.js"> </script>
+{% endblock %}
+
+
+
