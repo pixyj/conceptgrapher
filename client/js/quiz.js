@@ -246,8 +246,9 @@ var Quiz = Backbone.Model.extend({
 		}
 		attempt.quizId = this.get("id");
 		attempt = new Attempt(attempt, {parse: true});
-		this.attempts.add(attempt);
 		attempt.save();
+		this.attempts.add(attempt);
+		
 	},
 	isAttempted: function() {
 		return this.attempts.length > 0; 
