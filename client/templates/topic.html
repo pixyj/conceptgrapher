@@ -45,6 +45,10 @@
 <script type="text/html" id="concept-stats-template">
 	<td>
 		<a href="<%= url %>"> <%= name %> </a>
+		<% if(progress == 1) {%>
+			<span class="label label-success">✓</span>
+		<% } %>	
+		
 	</td>	
 	<td>
 		<%= quiz_count %>

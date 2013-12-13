@@ -175,7 +175,7 @@ var ConceptPlusStats = Backbone.Model.extend({
 	},
 	getProgress: function() {
 		var results = this.get("results");
-		return (results.correct + results.wrong) / this.get("quiz_count");
+		return (results.correct) / this.get("quiz_count");
 	},
 	toJSON: function() {
 		var attrs = Backbone.Model.prototype.toJSON.call(this);
