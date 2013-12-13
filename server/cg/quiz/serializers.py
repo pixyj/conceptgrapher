@@ -25,3 +25,16 @@ class QuizAttemptSerializer(ModelSerializer):
 		fields = ['created', 'guess', 'result']
 
 	
+
+class AggregateConceptAttemptSerializer(ModelSerializer):
+
+	class Meta:
+		fields = ['correct', 'wrong']
+
+	def to_dict(self, aggregate):
+		attrs = super(AggregateConceptAttemptSerializer, self).to_dict(aggregate)
+		attrs['concept_id'] = aggregate.concept_id
+		return attrs
+
+
+

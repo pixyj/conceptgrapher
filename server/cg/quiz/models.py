@@ -52,12 +52,27 @@ class Choice(models.Model):
 		unique_together = ("quiz", "text")
 
 
+"""
+Todo: Extend django.contrib.auth.User
+"""
+def get_unique_user_key(**kwargs):
+	if kwargs.get("user"):
+		return str(kwargs['user'].id)
+	elif kwargs.get("session_key"):
+		return kwargs['session_key'][0:5]
+
+	assert(False)
+
+
 class BaseQuizAttempt(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	quiz = models.ForeignKey(Quiz)
 	guess = models.TextField()
 	result = models.BooleanField()	
 	
+	def get_unique_user_key(self):
+		raise Exception("Subclass must implement this method")
+
 	def to_dict(self):
 		return QuizAttemptSerializer().to_dict(self)
 
@@ -67,6 +82,9 @@ class BaseQuizAttempt(models.Model):
 
 class UserQuizAttempt(BaseQuizAttempt):
 	user = models.ForeignKey(User)	
+	
+	def get_unique_user_key(self):
+		return get_unique_user_key(user=self.user)
 
 	def __unicode__(self):
 		return "{} attempted {} - {}".format(self.user, self.quiz, self.result)
@@ -79,6 +97,9 @@ class UserQuizAttempt(BaseQuizAttempt):
 class AnonQuizAttempt(BaseQuizAttempt):
 	session_key = models.CharField(max_length=40)
 
+	def get_unique_user_key(self):
+		return get_unique_user_key(session_key=self.session_key)
+
 	def __unicode__(self):
 		return "{} attempted {} - {}".format(self.session_key, self.quiz, self.result)
 		
@@ -87,3 +108,24 @@ class AnonQuizAttempt(BaseQuizAttempt):
 			("quiz", "session_key", "guess"), #For logged in users
 		)
 
+
+class AggregateConceptAttempt(models.Model):
+	concept = models.ForeignKey(Concept)
+	user_key = models.CharField(max_length=5)
+	correct = models.IntegerField(default=0)
+	wrong = models.IntegerField(default=0)
+
+	def __unicode__(self):
+		return "{}'s attempts in {}: correct:{} wrong:{}".format(
+			self.user_key, self.concept, self.correct, self.wrong)
+
+
+def get_topic_stats_by_user(topic, user_key):
+	concepts = topic.get_top_sorted_concepts()
+	stats = AggregateConceptAttempt.objects.filter(user_key=user_key).filter(
+		concept__in=concepts)
+	return (concepts, stats)
+
+
+#signals
+from . import receivers

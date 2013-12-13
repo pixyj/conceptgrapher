@@ -91,7 +91,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-CACHES_2 = {
+CACHES = {
     "default": {
         "BACKEND": "redis_cache.cache.RedisCache",
         "LOCATION": "127.0.0.1:6379:1",

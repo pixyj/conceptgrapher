@@ -1,22 +1,41 @@
 {% extends "base.html" %}
 	
+{% block css %}
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/topic.css">
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/quiz.css">
+{% endblock %}
+
+
 {% block content %}
-In the order of learning:
-{% for concept in concepts %}
-	<li>
-		<h3><a href="{{ concept.slug }}/"> {{ concept.name }} </a></h3>
-	</li>
-{% endfor %}
+
+<div id="content-wrapper" class="container">
+
+</div>
+
+
 
 {% endblock %}
 
 
 {% block js_objects %}
 	conceptsPlusQuizzes = {{ concepts_with_quizzes | safe }}
+	concepts = {{ concepts | safe }}
+	stats = {{ stats | safe }}
+	
 {%endblock %}
 
 {% block templates %}
 	{% include "quiz-templates.html" %}
+
+<script type="text/html" id="quiz-container-template">
+	<h2> Try to answer these questions to see where you are </h2>
+	<div id="quiz-container">
+		<h2 id="now-concept"> </h2>
+		<div class="now-quiz">
+		</div>
+	</div>
+</script>
+
 {% endblock %}
 
 

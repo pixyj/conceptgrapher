@@ -1,9 +1,132 @@
 /******************************************************************************
-*App -> Container object. 
+*	App -> Container object. 
 ******************************************************************************/
 var App = {
 
 }
+
+/******************************************************************************
+*	Views
+******************************************************************************/
+
+var ChoiceView = BaseView.extend({
+	template: "#choice-template",
+	checkAnswer: function() {
+		var guess = this.$el.find("input").is(":checked");
+		var store = {
+			guess: ""
+		};
+		store.result = (guess === this.model.get("is_correct"));
+		if(guess) {
+			store.guess = this.model.get("text");
+		}
+		return store;
+	}
+});
+
+var BasicAttemptView = BaseView.extend({
+	tagName: "tr",
+	template: "#quiz-basic-attempt-template"
+});
+
+var BasicAttemptListView = ListView.extend({
+	SingleView: BasicAttemptView
+});
+
+var QuizView = BaseView.extend({
+	template: "#single-quiz-template",
+	events: {
+		"click .quiz-submit": "onSubmit",
+		"keyup .quiz-guess": "submitAnswerOnEnter",
+		"click .quiz-next": "showNext"
+	},
+	render: function() {
+		BaseView.prototype.render.call(this);
+		if(this.model.get("isMCQ")) {
+			this.renderChoices(this.model.choices.models);
+		}
+		this.attemptListView = new BasicAttemptListView({
+			collection: this.model.attempts,
+			el: this.$el.find("tbody")
+		});
+		this.attemptListView.render();
+	},
+	afterRender: function() {
+		window.scrollTo(0, 0);
+		this.$el.find(".quiz-guess").focus();
+		this.$el.find(".quiz-wrong-submit").hide();
+		this.setQuizGuessStatus();
+	},
+	renderChoices:function(choices) {
+		this.choices = [];
+		var self = this;
+		choices.forEach(function(c) {
+			var view = new ChoiceView({model: c});
+			view.render();
+			self.choices.push(view);
+			self.$el.find(".choices").append(view.$el);
+		});
+	},
+	showNext: function(evt) {
+		this.options.parent.showNext(this.model);
+	},
+	setQuizGuessStatus: function() {
+		this.$el.find(".quiz-guess").attr("disabled", this.model.get("answered"));
+	},
+	onSubmit: function(evt) {
+		var attempt = this.createAttempt();
+		if(attempt.result) {
+			this.options.parent.showNext(this.model);	
+		}
+		else {
+			this.$el.find(".quiz-wrong-submit").show();
+		}
+		this.setQuizGuessStatus();
+	},
+	createAttempt: function(evt) {
+		var i;
+		var attempt = {};
+		if(!this.model.get("isMCQ")) {
+			attempt.guess = $.trim(this.$el.find(".quiz-guess").val());
+			attempt.result = (attempt.guess === String(this.model.get("answer")));
+		}
+		else {
+			attempt = this.checkMCQAnswer();
+		}
+		console.log(attempt);
+		this.model.addAttempt(attempt);
+		return attempt;
+	},
+
+	checkMCQAnswer: function() {
+		var result = true;
+		var guesses = "";
+		var data;
+		var length = this.choices.length;
+		for(i = 0; i<length; i++) {
+			data = this.choices[i].checkAnswer();
+			if(data.guess) {
+				guesses += data.guess + ", ";
+			}
+			if(!data.result) {
+				result = false;
+			}
+		}
+		guesses = guesses.slice(0, guesses.length - 2);
+		return {
+			result: result,
+			guess: guesses
+		}
+
+	},
+	submitAnswerOnEnter: function(evt) {
+		if(evt.keyCode == 13) {
+			this.onSubmit();
+		}
+	}
+
+});
+
 
 /******************************************************************************
 * Models and Collections
@@ -103,6 +226,9 @@ var DetailedAttemptCollection = Backbone.Collection.extend({
 App.mk = new Markdown.Converter();
 
 var Quiz = Backbone.Model.extend({
+	defaults: {
+		answered: false
+	},
 	parse: function(attrs) {
 		this.attempts = new AttemptCollection(attrs.attempts)
 		delete attrs.attempts;
@@ -124,7 +250,7 @@ var Quiz = Backbone.Model.extend({
 		attempt.save();
 	},
 	isAttempted: function() {
-		return this.attempts.length > 0;
+		return this.attempts.length > 0; 
 	}
 });
 

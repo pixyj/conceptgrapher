@@ -4,7 +4,7 @@ from django.db import models
 from pagedown.widgets import AdminPagedownWidget
 
 
-from .models import Quiz, Choice, UserQuizAttempt, AnonQuizAttempt
+from .models import Quiz, Choice, UserQuizAttempt, AnonQuizAttempt, AggregateConceptAttempt
 
 class ChoiceInline(admin.StackedInline):
 	model = Choice
@@ -24,6 +24,8 @@ admin.site.register(Quiz, QuizAdmin)
 
 admin.site.register(UserQuizAttempt)
 admin.site.register(AnonQuizAttempt)
+
+admin.site.register(AggregateConceptAttempt)
 
 from django.contrib import admin
 

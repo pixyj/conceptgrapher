@@ -120,3 +120,29 @@ var ProgressBaseView = Backbone.View.extend({
 		$('.progress .progress-bar').css("width", progressPercentage);
 	}
 });
+
+var BaseRouter = Backbone.Router.extend({
+	constructor: function(options) {
+		this.options = options;
+		Backbone.Router.call(this, options);
+		this.currentView = undefined;
+	},
+
+	setCurrentView: function(view) {
+		var obj = this.options.views[view];
+		if(this.currentView) {
+			if(obj.constructor === this.currentView.constructor) {
+				return; //View already current;
+			}
+			this.currentView.remove();
+			this.currentView.unbind();
+		}
+		this.currentView = new obj.constructor(obj.options);
+		this.currentView.render();
+		$("#content-wrapper").html(this.currentView.$el);
+		window.scrollTo(0, 0);
+		return this.currentView;
+	}
+});
+
+

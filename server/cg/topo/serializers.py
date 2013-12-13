@@ -19,3 +19,11 @@ class ConceptSerializer(ModelSerializer):
 	class Meta:
 		fields = ['id', 'name', 'slug']
 
+
+
+class ConceptPlusQuizCountSerializer(ConceptSerializer):
+	def to_dict(self, instance):
+		attrs = super(ConceptPlusQuizCountSerializer, self).to_dict(instance)
+		attrs['quiz_count'] = instance.quiz_set.count()
+		return attrs
+	

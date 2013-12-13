@@ -41,6 +41,37 @@ var TestAnalysisView = Backbone.View.extend({
 	}
 });
 
+AnalysisQuizView = QuizView.extend({
+	onSubmit: function(evt) {
+		var attempt = this.createAttempt(evt);
+		this.options.analysis.analyzeAttempt(attempt);
+	}
+});
+
+var AnalysisQuizContainerView = BaseView.extend({
+	template: "#quiz-container-template",
+	init: function() {
+		this.model.on("change:nowConcept", this.updateConcept, this);
+		this.model.on("change:nowQuiz", this.updateQuiz, this);
+	},
+	updateConcept: function(model, concept) {
+		this.$el.find("#now-concept").html(concept.get("name"));
+	},
+	updateQuiz: function(model, quiz) {
+		if(this.quiz) {
+			this.quiz.remove();
+			this.quiz.unbind();
+		}
+		this.quiz = new AnalysisQuizView({model: quiz, analysis: this.model});
+		this.quiz.render();
+		this.$el.find(".now-quiz").html(this.quiz.$el);
+	}
+
+});
+
+/******************************************************************************
+* Models
+******************************************************************************/
 
 var ConceptResultsMixin = {
 	incrementResults: function(totalResults, result) {
@@ -99,6 +130,9 @@ var ConceptPlusCollection = Backbone.Collection.extend({
 	model: ConceptPlusQuizzes
 });
 
+/******************************************************************************
+* Analysis
+******************************************************************************/
 //Too fancy a name?
 var TopicSkillAnalysis = Backbone.Model.extend({
 	defaults: {
@@ -129,7 +163,7 @@ var TopicSkillAnalysis = Backbone.Model.extend({
 		this.set("nowQuiz", quiz);
 		console.log("Set next concept", index, concept.toJSON());
 	},
-	onAttempt: function(result) {
+	analyzeAttempt: function(result) {
 		this.incrementResults(this.get("totalResults"), result);
 		var total = this.getTotalAttempts(this.get("totalResults"));
 		
@@ -222,17 +256,44 @@ _.extend(TopicSkillAnalysis.prototype, ConceptResultsMixin);
 
 
 
+/******************************************************************************
+* Router And Initialization
+******************************************************************************/
+var AppRouter = BaseRouter.extend({
+	routes: {
+		"analysis": "setAnalysis"
+		//"#results": "setDashboard",
+	},
+	setAnalysis: function() {
+		var view = this.setCurrentView("analysis");
+		$("#content-wrapper").html(view.$el);
+		this.options.model.start();
+	}
+
+});
+
 
 
 var init = function() {
 	cc = new ConceptPlusCollection();
-	var copy = $.extend(true, conceptsPlusQuizzes, {});
-	cc.add(copy, {parse: true});
-	run();
+	cc.add(conceptsPlusQuizzes, {parse: true});
+	a = new TopicSkillAnalysis({collection: cc});
+
+	var views = {
+		analysis: {
+			constructor: AnalysisQuizContainerView,
+			options: {model: a}
+		}
+	}
+
+	App.router = new AppRouter({views: views, model: a});
+	Backbone.history.start();
+	App.router.navigate("#analysis", {trigger: true});
 
 }
 
-var run = function() {
+
+var testRun = function() {
 	a = new TopicSkillAnalysis({collection: cc});
 	v = new TestAnalysisView({model: a});
 	a.start();
