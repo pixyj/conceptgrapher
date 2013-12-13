@@ -69,6 +69,33 @@ var AnalysisQuizContainerView = BaseView.extend({
 
 });
 
+var ConceptStatsView = BaseView.extend({
+	template: "#concept-stats-template",
+	tagName: "tr"
+});
+
+var StatsTableView = TableView.extend({
+	columns: ["Concept", "Total Questions", "Answered Correctly"],
+	SingleView: ConceptStatsView,
+	afterRender: function() {
+		this.$el.addClass("table table-striped table-bordered");
+	}
+});
+
+var StatsDashboardContainerView = BaseView.extend({
+	template: "#topic-dashboard-template",
+	init: function() {
+		this.statsTable = new StatsTableView({collection: this.collection});
+	},
+	render: function() {
+		var html = this.compiledTemplate();
+		this.$el.html(html);
+		this.statsTable.render();
+		this.$el.find("#stats-table").html(this.statsTable.$el);
+		return this;
+	}
+});
+
 /******************************************************************************
 * Models
 ******************************************************************************/
@@ -128,6 +155,38 @@ _.extend(ConceptPlusQuizzes.prototype, ConceptResultsMixin);
 
 var ConceptPlusCollection = Backbone.Collection.extend({
 	model: ConceptPlusQuizzes
+});
+
+var ConceptPlusStats = Backbone.Model.extend({
+	defaults: {
+		results: {
+			correct: 0,
+			wrong: 0
+		}
+	},
+	parse: function(attrs) {
+		if(!attrs.topicSlug) {
+			throw new Error("TopicSlug not found");
+		}
+		return attrs;
+	},
+	getUrl: function() {
+		return "/" + this.get("topicSlug") + "/" + this.get("slug") + "/";
+	},
+	getProgress: function() {
+		var results = this.get("results");
+		return (results.correct + results.wrong) / this.get("quiz_count");
+	},
+	toJSON: function() {
+		var attrs = Backbone.Model.prototype.toJSON.call(this);
+		attrs.url = this.getUrl();
+		attrs.progress = this.getProgress();
+		return attrs;
+	}
+});
+
+var ConceptPlusStatsCollection = Backbone.Collection.extend({
+	model: ConceptPlusStats
 });
 
 /******************************************************************************
@@ -261,20 +320,47 @@ _.extend(TopicSkillAnalysis.prototype, ConceptResultsMixin);
 ******************************************************************************/
 var AppRouter = BaseRouter.extend({
 	routes: {
-		"analysis": "setAnalysis"
-		//"#results": "setDashboard",
+		"analysis": "setAnalysis",
+		"dashboard": "setDashboard",
 	},
 	setAnalysis: function() {
 		var view = this.setCurrentView("analysis");
 		$("#content-wrapper").html(view.$el);
 		this.options.model.start();
+	},
+	setDashboard: function() {
+		var view = this.setCurrentView("dashboard");
+		$("#content-wrapper").html(view.$el);
 	}
 
 });
 
-
-
 var init = function() {
+	var statsByConcept = {}
+	stats.forEach(function(s) {
+		statsByConcept[s.concept_id] = s;
+	});
+
+	concepts.forEach(function(c) {
+		c.topicSlug = topicSlug;
+		var stat = statsByConcept[c.id];
+		if(stat) {
+			c.results = stat;
+		}
+	});
+	cc = new ConceptPlusStatsCollection();
+	cc.add(concepts);
+	
+	v = new StatsDashboardContainerView({collection: cc});
+	v.render();
+	$("#content-wrapper").html(v.$el);
+	return concepts;
+
+
+
+}
+
+var init2 = function() {
 	cc = new ConceptPlusCollection();
 	cc.add(conceptsPlusQuizzes, {parse: true});
 	a = new TopicSkillAnalysis({collection: cc});
@@ -298,7 +384,8 @@ var testRun = function() {
 	v = new TestAnalysisView({model: a});
 	a.start();
 	v.run();
-	console.log(a.toJSON().name)
+	console.log(a.toJSON().name);
+
 }
 
 

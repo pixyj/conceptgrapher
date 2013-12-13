@@ -21,6 +21,7 @@
 	conceptsPlusQuizzes = {{ concepts_with_quizzes | safe }}
 	concepts = {{ concepts | safe }}
 	stats = {{ stats | safe }}
+	topicSlug = "{{ topic.slug }}"
 	
 {%endblock %}
 
@@ -34,6 +35,23 @@
 		<div class="now-quiz">
 		</div>
 	</div>
+</script>
+
+<script type="text/html" id="topic-dashboard-template">
+	<div id="stats-table">
+	</div>	
+</script>
+
+<script type="text/html" id="concept-stats-template">
+	<td>
+		<a href="<%= url %>"> <%= name %> </a>
+	</td>	
+	<td>
+		<%= quiz_count %>
+	</td>
+	<td>
+		<%= results.correct %>
+	</td>
 </script>
 
 {% endblock %}
