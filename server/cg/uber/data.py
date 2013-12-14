@@ -32,6 +32,12 @@ def clear_all():
 	db_path = os.path.join(base_dir, "cg/sqlite3.db")
 	os.remove(db_path)
 
+def dumpdata():
+	uber_dir = os.path.dirname(os.path.realpath(__file__))
+	path = "{}/fixtures/all.json".format(uber_dir)
+	with open(path, "w") as f:
+		management.call_command("dumpdata", stdout=f)
+	
 
 import simplejson
 def ok():
