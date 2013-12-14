@@ -336,6 +336,16 @@ var AppRouter = BaseRouter.extend({
 });
 
 var init = function() {
+	var testTaken = stats.length > 0;
+	//var navigation
+	if(testTaken) {
+		initDashboard();
+	} else {
+		initAnalysis();
+	}
+}
+
+var initDashboard = function() {
 	var statsByConcept = {}
 	stats.forEach(function(s) {
 		statsByConcept[s.concept_id] = s;
@@ -348,34 +358,31 @@ var init = function() {
 			c.results = stat;
 		}
 	});
-	cc = new ConceptPlusStatsCollection();
+	var cc = new ConceptPlusStatsCollection();
 	cc.add(concepts);
 	
-	v = new StatsDashboardContainerView({collection: cc});
+	var v = new StatsDashboardContainerView({collection: cc});
 	v.render();
 	$("#content-wrapper").html(v.$el);
+	var r = new Backbone.Router();
+	Backbone.history.start();
+	r.navigate("dashboard");
 	return concepts;
-
-
 
 }
 
-var init2 = function() {
-	cc = new ConceptPlusCollection();
+var initAnalysis = function() {
+	var cc = new ConceptPlusCollection();
 	cc.add(conceptsPlusQuizzes, {parse: true});
-	a = new TopicSkillAnalysis({collection: cc});
+	var a = new TopicSkillAnalysis({collection: cc});
 
-	var views = {
-		analysis: {
-			constructor: AnalysisQuizContainerView,
-			options: {model: a}
-		}
-	}
-
-	App.router = new AppRouter({views: views, model: a});
+	var v = new AnalysisQuizContainerView({model: a});
+	v.render();
+	$("#content-wrapper").html(v.$el);
+	a.start();
+	var r = new Backbone.Router();
 	Backbone.history.start();
-	App.router.navigate("#analysis", {trigger: true});
-
+	r.navigate("analysis");
 }
 
 
