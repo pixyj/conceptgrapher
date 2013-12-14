@@ -51,13 +51,14 @@ AnalysisQuizView = QuizView.extend({
 var AnalysisQuizContainerView = BaseView.extend({
 	template: "#quiz-container-template",
 	init: function() {
-		this.model.on("change:nowConcept", this.updateConcept, this);
-		this.model.on("change:nowQuiz", this.updateQuiz, this);
+		this.model.on("change:conceptNow", this.updateConcept, this);
+		this.model.on("change:conceptRedirect", this.redirectToConcept, this);
 	},
 	updateConcept: function(model, concept) {
 		this.$el.find("#now-concept").html(concept.get("name"));
+		this.updateQuiz(concept.quiz);
 	},
-	updateQuiz: function(model, quiz) {
+	updateQuiz: function(quiz) {
 		if(this.quiz) {
 			this.quiz.remove();
 			this.quiz.unbind();
@@ -65,6 +66,11 @@ var AnalysisQuizContainerView = BaseView.extend({
 		this.quiz = new AnalysisQuizView({model: quiz, analysis: this.model});
 		this.quiz.render();
 		this.$el.find(".now-quiz").html(this.quiz.$el);
+	},
+	redirectToConcept: function(model, concept) {
+		console.log("Get Started at ", concept.toJSON());
+		this.quiz.remove();
+		this.quiz.unbind();
 	}
 
 });
@@ -100,61 +106,16 @@ var StatsDashboardContainerView = BaseView.extend({
 * Models
 ******************************************************************************/
 
-var ConceptResultsMixin = {
-	incrementResults: function(totalResults, result) {
-		if(result) {
-			totalResults.correct += 1;
-		} else {
-			totalResults.wrong += 1;
-		}
-		return totalResults;	
-	},
-	resultsToString: function(results) {
-		return String(results.correct) + String(results.wrong);
-	},
-	getCorrectRatio: function(results) {
-		if(!results.correct && !results.wrong) {
-			return 0;
-		}
-		return (results.correct)/(results.correct + results.wrong);
-	},
-	getTotalAttempts: function(results) {
-		return (results.correct + results.wrong);
-	}
-}
-
-var ConceptPlusQuizzes = Backbone.Model.extend({
+var ConceptPlusQuiz = Backbone.Model.extend({
 	parse: function(attrs) {
-		this.quizzes = new QuizCollection();
-		this.quizzes.add(attrs.quizzes, {parse: true});
-		delete attrs.quizzes;
-		attrs.skill = 0;
+		attrs.quiz.showAttempts = false;
+		this.quiz = new Quiz(attrs.quiz, {parse: true});
 		return attrs;
-	},
-	getAttemptResults: function() {
-		var results = {"correct": 0, "wrong": 0};
-		var self = this;
-		this.quizzes.forEach(function(q) {
-			if(q.attempts.length) {
-				var result = q.attempts.at(0).get("result");
-				self.incrementResults(results, result);
-			}
-		});
-		return results;
-	},
-	allQuizzesAttemped: function() {
-		for(var i=0; i < this.quizzes.length; i++) {
-			if(!this.quizzes.at(i).isAttempted()) {
-				return false;
-			}
-		}
 	}
 });
 
-_.extend(ConceptPlusQuizzes.prototype, ConceptResultsMixin);
-
-var ConceptPlusCollection = Backbone.Collection.extend({
-	model: ConceptPlusQuizzes
+var ConceptPlusQuizCollection = Backbone.Collection.extend({
+	model: ConceptPlusQuiz
 });
 
 var ConceptPlusStats = Backbone.Model.extend({
@@ -191,127 +152,81 @@ var ConceptPlusStatsCollection = Backbone.Collection.extend({
 
 /******************************************************************************
 * Analysis
+* 1. Fetch all concepts in topic with one quiz each.
+* 2. Start off with quiz in median concept.
+* 3. If quiz is answered correctly, go to next concept
+*    	Continue until quiz is answered incorrectly.
+* 4. If not, got to previous concept.
+* 5. 	Continue until quiz is answered correctly.
+* 6. Direct user to current concept.
+
+Lots of work to be done in routing student to the concept according 
+to the level of expertise without wasting time answering known stuff or in 
+directing to a concept too advanced. 
+
+Immediate Todo # Speed up when answering streak improves and vice versa.
+
 ******************************************************************************/
 //Too fancy a name?
 var TopicSkillAnalysis = Backbone.Model.extend({
 	defaults: {
-		totalResults: {correct: 0, wrong: 0},
 		done: false
 	},
 
 	initialize: function(options) {
 		this.concepts = options.collection;
-		var maxAttempts = this.concepts.length * 2 * 0.25;
-		this.set("maxAttempts", maxAttempts);
+		this.streak = 0;
 	},
 	start: function() {
 		var index = this.concepts.length / 2;
-		this.setNextConceptAndQuiz(index);
+		this.setNextConcept(index);
 	},
-	setNextConceptAndQuiz: function(index) {
+	setNextConcept: function(index) {
 		var concept = this.concepts.at(index);
-		var quiz = concept.quizzes.at(0);
-
-		if(quiz.isAttempted()) {
-			quiz = concept.quizzes.at(1);
-		}
-		if(quiz.isAttempted()) {
-			console.log("Quiz attempted already", concept, quiz);
-		}
-		this.set("nowConcept", concept);
-		this.set("nowQuiz", quiz);
-		console.log("Set next concept", index, concept.toJSON());
-	},
-	analyzeAttempt: function(result) {
-		this.incrementResults(this.get("totalResults"), result);
-		var total = this.getTotalAttempts(this.get("totalResults"));
+		this.set("conceptNow", concept);
 		
-		if(total >= this.get("maxAttempts")) {
-			this.set("done", true);
-			return;
-		}
-		var results = this.get("nowConcept").getAttemptResults();
-		pathMap = {
-			"10": "setNextQuizInConcept",
-			"20": "moveForward",
-			"11": "moveBasedOnPreviousResults",
-			"01": "moveBack",
-			"02": "moveBack"
-		};
-		var key = this.resultsToString(results);
-		var attemptHandler = pathMap[key];
-		if(!attemptHandler) {
-			console.error("Invalid result key", results, key);
-		}
-		this[attemptHandler]();
-		return results;
 	},
-	setNextQuizInConcept: function() {
-		var quiz = this.get("nowConcept").quizzes.at(1);
-		if(!quiz) {
-			//Only one quiz found in concept;
-			this.moveForward();
-		}
-		this.set("nowQuiz", quiz);
-	},
-	moveForward: function(concept) {
-		concept = concept || this.get("nowConcept");
-		var index = this.concepts.indexOf(concept);
-		if(index === this.concepts.length - 1) {
-			this.set("done", true);
-			return;
-		}
-		var ratio = this.getCorrectRatio(this.get("totalResults"));
-		var step = ratio >= 0.75 ? 2 : 1;
-		var next = index + step;
-		if(next >= this.concepts.length) {
-			next = this.concepts.length - 1;
-		}
-		var nextConcept = this.concepts.at(next);
-		if(nextConcept.allQuizzesAttemped()) {
-			this.moveForward(nextConcept);
+	analyzeAttempt: function(attempt) {
+		var conceptNow = this.get("conceptNow");
+		var indexNow = this.concepts.indexOf(conceptNow);
+		var next;
+		var done = false;
+		if(attempt.result) {
+			next =  indexNow + 1;
+			if(this.streak == -1) {
+				done = true;
+			}
 		}
 		else {
-			this.setNextConceptAndQuiz(next);	
+			if(this.streak == 1) {
+				next = indexNow;
+				done = true;
+			}
+			else {
+				next = indexNow - 1;
+			}
 		}
-	},
-	moveBack: function(concept) {
-		var concept = concept || this.get("nowConcept");
-		var index = this.concepts.indexOf(concept);
-		if(index === 0) {
-			this.set("done", true);
-			return;
-		}
-		var ratio = this.getCorrectRatio(this.get("totalResults"));
-		var step = ratio <= 0.5 ? 2: 1;
-		var next = index - step;
+		//Boundary conditions
+		//next = this.concepts.length;
 		if(next < 0) {
 			next = 0;
+			done = true;
 		}
-		var nextConcept = this.concepts.at(next);
-		if(nextConcept.allQuizzesAttemped()) {
-			this.moveForward(nextConcept);
+		else if(next >= this.concepts.length) {
+			next = this.concepts.length - 1;
+			done = true;
 		}
-		else {
-			this.setNextConceptAndQuiz(next);	
+		if(done) {
+			this.set("conceptRedirect", this.concepts.at(next));
+			return;
 		}
+		this.streak = attempt.result ? 1 : -1;
+		this.setNextConcept(next);
+		console.log("Done? ", done);
+		this.set("done", done);
 	},
-	moveBasedOnPreviousResults: function() {
-		var concept = this.get("nowConcept");
-		var index = this.concepts.indexOf(concept);
-		var ratio = this.getCorrectRatio(this.get("totalResults"));
-		if(ratio >= 0.75) {
-			this.moveForward();
-		}
-		else {
-			this.moveBack();
-		}
-	}
-
 
 });
-
-_.extend(TopicSkillAnalysis.prototype, ConceptResultsMixin);
 
 
 
@@ -338,6 +253,8 @@ var AppRouter = BaseRouter.extend({
 var init = function() {
 	var testTaken = stats.length > 0;
 	//var navigation
+	initAnalysis();
+	return;
 	if(testTaken) {
 		initDashboard();
 	} else {
@@ -372,7 +289,7 @@ var initDashboard = function() {
 }
 
 var initAnalysis = function() {
-	var cc = new ConceptPlusCollection();
+	var cc = new ConceptPlusQuizCollection();
 	cc.add(conceptsPlusQuizzes, {parse: true});
 	var a = new TopicSkillAnalysis({collection: cc});
 

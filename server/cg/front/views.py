@@ -47,7 +47,7 @@ def render_topic(request, topic_slug):
 		#heavy duty query. Cache if necesssary
 		concepts = [concept_serializer.to_dict(c) for c in concepts]
 		stats = [aggregate_serializer.to_dict(a) for a in stats]
-		concepts_with_quizzes = simplejson.dumps([])
+		concepts_with_quizzes = get_serialized_quizzes_by_topic(topic)
 	else:
 		concepts_with_quizzes = get_serialized_quizzes_by_topic(topic)
 		concepts, stats = [], []	

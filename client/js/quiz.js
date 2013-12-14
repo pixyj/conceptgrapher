@@ -135,7 +135,7 @@ var QuizView = BaseView.extend({
 
 var Choice = Backbone.Model.extend({
 	defaults: {
-		hasMultipleAnswers: false,
+		hasMultipleAnswers: false
 	},
 	parse: function(attrs) {
 		attrs.cid = this.cid;
@@ -233,6 +233,7 @@ var Quiz = Backbone.Model.extend({
 	defaults: {
 		answered: false,
 		hasMultipleAnswers: false,
+		showAttempts: true
 	},
 	parse: function(attrs) {
 		this.attempts = new AttemptCollection(attrs.attempts)

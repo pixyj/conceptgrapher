@@ -22,9 +22,10 @@ def get_quizzes_by_topic(topic):
 	concepts = topic.get_top_sorted_concepts()
 	serialized_concepts = []
 	for concept in concepts:
-		quizzes = [quiz_serializer.to_dict(quiz) for quiz in concept.quiz_set.all()[:2]]
+		quiz = concept.quiz_set.all()[0]
+		quiz = quiz_serializer.to_dict(quiz)
 		concept_dict = concept_serializer.to_dict(concept)
-		concept_dict['quizzes'] = quizzes
+		concept_dict['quiz'] = quiz
 		serialized_concepts.append(concept_dict)
 
 	return serialized_concepts	
