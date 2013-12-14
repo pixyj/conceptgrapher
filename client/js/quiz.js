@@ -61,6 +61,7 @@ var QuizView = BaseView.extend({
 		this.choices = [];
 		var self = this;
 		choices.forEach(function(c) {
+
 			var view = new ChoiceView({model: c});
 			view.render();
 			self.choices.push(view);
@@ -133,6 +134,9 @@ var QuizView = BaseView.extend({
 ******************************************************************************/
 
 var Choice = Backbone.Model.extend({
+	defaults: {
+		hasMultipleAnswers: false,
+	},
 	parse: function(attrs) {
 		attrs.cid = this.cid;
 		return attrs;
@@ -227,17 +231,39 @@ App.mk = new Markdown.Converter();
 
 var Quiz = Backbone.Model.extend({
 	defaults: {
-		answered: false
+		answered: false,
+		hasMultipleAnswers: false,
 	},
 	parse: function(attrs) {
 		this.attempts = new AttemptCollection(attrs.attempts)
 		delete attrs.attempts;
 		attrs.question = App.mk.makeHtml(attrs.question);
 		attrs.isMCQ = attrs.choices.length !== 0;
+		if(attrs.isMCQ) {
+			attrs.hasMultipleAnswers = this.hasMultipleAnswers(attrs.choices);
+		}
+		if(attrs.hasMultipleAnswers) {
+			attrs.choices.forEach(function(c) {
+				c.hasMultipleAnswers = true;
+			});
+		}
+		attrs.choices.forEach(function(c) {
+			c.quizId = attrs.id;
+		});
 
 		this.choices = new ChoiceCollection(attrs.choices, {parse:true});
 		delete attrs.choices;
 		return attrs;
+	},
+	hasMultipleAnswers: function(choices) {
+		var i, length;
+		var answers = 0;
+		for(i = 0, length = choices.length; i < length; i++) {
+			if(choices[i].is_correct) {
+				answers += 1;
+			}
+		}
+		return answers > 1;
 	},
 
 	addAttempt: function(attempt) {

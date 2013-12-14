@@ -2,10 +2,18 @@
 	<div class="row choice-row">
 	  <div class="col-lg-6">
 	    <div class="input-group">
-	      <span class="input-group-addon">
-	        <input type="checkbox" id="choice-<%= cid %>">
-	      </span>
-	      <label for="choice-<%= cid %>" class="form-control"> <%= text %> </label>
+	      <% if(hasMultipleAnswers) { %>
+	      	<span class="input-group-addon">
+	        	<input type="checkbox" id="choice-<%= cid %>">
+	      	</span>
+	      	<label for="choice-<%= cid %>" class="form-control"> <%= text %> </label>
+	      <% } else { %>
+	      		<span class="input-group-addon">
+	      	 		<input type="radio" name="quiz-<%= quizId %>" id="choice-<%= cid %>">
+	      	 	</span>
+	      	 	<label for="choice-<%= cid %>" class="form-control"> <%= text %> </label>
+	      <% } %>
+
 	    </div>
 	  </div>
 	</div>
