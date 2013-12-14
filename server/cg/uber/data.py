@@ -14,17 +14,9 @@ def load_table(fixture_file):
 def load_all():
 	management.call_command("syncdb")
 	graph.initialize_graph()	
-	models = ['Auth']
-	models += ['Topic', 'Concept', 'ConceptRelationship', 'ConceptResource']
-	models += ['Quiz', 'Choice'] 
-	#models += ['UserQuizAttempt', 'AnonQuizAttempt']
-	
-
-	for m in models:
-		fixture_file = "{}.json".format(m)
-		load_table(fixture_file)
-
-	#graph.build_graph(ConceptRelationship.objects.all())
+	uber_dir = os.path.dirname(os.path.realpath(__file__))
+	fixture_path = "{}/fixtures/{}".format(uber_dir, "all.json")
+	management.call_command("loaddata", fixture_path)
 		
 def clear_all():
 	graph.delete_graph()

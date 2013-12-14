@@ -317,7 +317,7 @@ var QuizCollection = Backbone.Collection.extend({
 
 var NextConcept = Backbone.Model.extend({
 	url: function() {
-		return "/api/topo/concept/" + this.get("conceptId") + "/next"
+		return "/api/quiz/concept/" + this.get("conceptId") + "/next"
 	},
 	parse: function(attrs) {
 		attrs.url = "/" + this.get("topicSlug") + "/" + attrs.slug + "/"

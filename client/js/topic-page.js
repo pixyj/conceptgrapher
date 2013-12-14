@@ -75,7 +75,7 @@ var ConceptStatsView = BaseView.extend({
 });
 
 var StatsTableView = TableView.extend({
-	columns: ["Concept", "Total Questions", "Answered Correctly"],
+	columns: ["Concept", "Quizzes", "Answered Correctly"],
 	SingleView: ConceptStatsView,
 	afterRender: function() {
 		this.$el.addClass("table table-striped table-bordered");

@@ -5,9 +5,12 @@ from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from django.core.cache import cache
 
+from topo.models import ConceptResource, Concept
+from topo.graph import get_top_sorted_concept_id_dict, get_top_sorted_concept_id_list
+from topo.serializers import ConceptSerializer
+
 from .models import Quiz, UserQuizAttempt, AnonQuizAttempt
 from .diagnose import set_topic_as_attempted
-
 
 def create_attempt(request):
 
@@ -40,5 +43,24 @@ def create_attempt(request):
 	topic_id = quiz.concept.topic.id
 	set_topic_as_attempted(user_cache_key, topic_id)	
 	return HttpResponse("OK")
+
+
+def get_next_concept(request, concept_id):
+	concept_id = int(concept_id) #Is this safe?
+
+	concept = get_object_or_404(Concept, pk=concept_id)
+	concepts_by_id = get_top_sorted_concept_id_dict()
+	concept_list = get_top_sorted_concept_id_list()
+	current_index = concepts_by_id[concept_id]
+	next_index = current_index + 1
+	try:
+		next_id = concept_list[next_index]
+	except IndexError:
+		return HttpResponse(status=404)
+
+	next_concept = Concept.objects.get(pk=next_id)
+	response = ConceptSerializer().to_json(next_concept)
+	return HttpResponse(response, content_type="application/json")
+
 
 
