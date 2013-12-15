@@ -73,25 +73,25 @@ var QuizView = BaseView.extend({
 	},
 	setQuizGuessStatus: function() {
 		this.$el.find(".quiz-guess").attr("disabled", this.model.get("answered"));
-		var isSubmitHidden = this.model.get("answered") === true;
-		var isNextHidden = !isSubmitHidden;
 
-		if(isSubmitHidden) {
+		var answered = this.model.get("answered");
+		if(answered) {
 			this.$el.find(".quiz-submit").hide();
 			this.$el.find(".quiz-next").show().focus();
+			this.$el.find(".quiz-wrong-submit").hide();
+			this.$el.find(".quiz-label-answered").show();
 
 		}
-		if(isNextHidden) {
+		else {
 			this.$el.find(".quiz-submit").show();
 			this.$el.find(".quiz-next").hide();
+			this.$el.find(".quiz-label-answered").hide();
 		}
 	},
 	onSubmit: function(evt) {
 		var attempt = this.createAttempt();
-		if(attempt.result) {
-			this.setQuizGuessStatus();
-		}
-		else {
+		this.setQuizGuessStatus();
+		if(!attempt.result) {
 			this.$el.find(".quiz-wrong-submit").show();
 		}
 		

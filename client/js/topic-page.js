@@ -43,8 +43,17 @@ var TestAnalysisView = Backbone.View.extend({
 
 AnalysisQuizView = QuizView.extend({
 	onSubmit: function(evt) {
-		var attempt = this.createAttempt(evt);
-		this.options.analysis.analyzeAttempt(attempt);
+		this.latestAttempt = this.createAttempt(evt);
+		this.setQuizGuessStatus();
+		if(!this.latestAttempt.result) {
+			
+		}
+	},
+	showNext: function() {
+		if(!this.latestAttempt) {
+			throw new Error("latestAttempt not found");
+		}
+		this.options.analysis.analyzeAttempt(this.latestAttempt);
 	}
 });
 

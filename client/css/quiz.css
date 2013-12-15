@@ -6,7 +6,17 @@
 	margin-bottom: 10px;
 }
 
-.label-answered {
+.quiz-label-answered {
 	font-size: 15px;
 }
 
+.quiz-status {
+	float: left;
+	width: 5%;
+}
+
+.quiz-content {
+	float: right;
+	width: 90%;
+	margin-left: 5%;
+}

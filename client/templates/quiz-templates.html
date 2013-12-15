@@ -40,12 +40,13 @@
 <script type="text/html" id="single-quiz-template">
 	
 	<div class="quiz-question"> 
-	<% if(answered) { %>
-		<span class="label label-success label-answered">✓</span>
-	<% } %>
-	<div>
+		<div class="quiz-status">
+		<span class="label label-success quiz-label-answered">✓</span>
+		</div>
+
+	<div class="quiz-content">
 	<%= question %> 
-	</div>
+
 	
 	<% if(isMCQ) { %>
 		<div class="choices">
@@ -78,6 +79,9 @@
 		</tbody>
 	</table>
 	<% } %>
+
+	</div>
+	</div>
 
 </script>
 
