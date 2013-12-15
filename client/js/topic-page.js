@@ -46,8 +46,11 @@ AnalysisQuizView = QuizView.extend({
 		this.latestAttempt = this.createAttempt(evt);
 		this.setQuizGuessStatus();
 		if(!this.latestAttempt.result) {
-			
+			this.$el.find(".quiz-next").removeClass("btn-success").
+			addClass("btn-primary").show().focus();
+			this.$el.find(".quiz-submit").hide();
 		}
+		$(this.$el.find(".quiz-guess")).attr("disabled", true);
 	},
 	showNext: function() {
 		if(!this.latestAttempt) {
@@ -55,6 +58,10 @@ AnalysisQuizView = QuizView.extend({
 		}
 		this.options.analysis.analyzeAttempt(this.latestAttempt);
 	}
+});
+
+var GetStartedView = BaseView.extend({
+
 });
 
 var AnalysisQuizContainerView = BaseView.extend({

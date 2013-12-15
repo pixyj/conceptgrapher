@@ -28,7 +28,8 @@ def dumpdata():
 	uber_dir = os.path.dirname(os.path.realpath(__file__))
 	path = "{}/fixtures/all.json".format(uber_dir)
 	with open(path, "w") as f:
-		management.call_command("dumpdata", stdout=f)
+		management.call_command("dumpdata", exclude=['quiz.UserQuizAttempt', 
+			'quiz.AnonQuizAttempt', 'quiz.AggregateConceptAttempt'], stdout=f)
 	
 
 import simplejson
