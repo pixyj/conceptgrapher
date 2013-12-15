@@ -61,7 +61,7 @@ AnalysisQuizView = QuizView.extend({
 });
 
 var GetStartedView = BaseView.extend({
-
+	template: "#get-started-template"
 });
 
 var AnalysisQuizContainerView = BaseView.extend({
@@ -87,7 +87,10 @@ var AnalysisQuizContainerView = BaseView.extend({
 		console.log("Get Started at ", concept.toJSON());
 		this.quiz.remove();
 		this.quiz.unbind();
-		this.$el.html("Get Started at " + concept.get("name"));
+		concept.set("topicSlug", topicSlug); //Todo. Remove global
+		var getStarted = new GetStartedView({model: concept});
+		getStarted.render();
+		this.$el.html(getStarted.$el);
 	}
 
 });
@@ -269,9 +272,6 @@ var AppRouter = BaseRouter.extend({
 
 var init = function() {
 	var testTaken = stats.length > 0;
-	//var navigation
-	initAnalysis();
-	return;
 	if(testTaken) {
 		initDashboard();
 	} else {
