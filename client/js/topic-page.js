@@ -71,6 +71,7 @@ var AnalysisQuizContainerView = BaseView.extend({
 		console.log("Get Started at ", concept.toJSON());
 		this.quiz.remove();
 		this.quiz.unbind();
+		this.$el.html("Get Started at " + concept.get("name"));
 	}
 
 });
@@ -220,9 +221,9 @@ var TopicSkillAnalysis = Backbone.Model.extend({
 			this.set("conceptRedirect", this.concepts.at(next));
 			return;
 		}
+		console.log("Done? ", done);
 		this.streak = attempt.result ? 1 : -1;
 		this.setNextConcept(next);
-		console.log("Done? ", done);
 		this.set("done", done);
 	},
 
