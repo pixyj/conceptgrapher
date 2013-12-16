@@ -4,4 +4,5 @@ simplejson
 django-pagedown
 redis
 django-redis
+django-compressor
 
