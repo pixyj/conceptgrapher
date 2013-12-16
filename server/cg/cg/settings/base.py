@@ -90,7 +90,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 
 
-CACHES_2 = {
+CACHES = {
     "default": {
         "BACKEND": "redis_cache.cache.RedisCache",
         "LOCATION": "127.0.0.1:6379:1",

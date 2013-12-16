@@ -93,11 +93,11 @@ def load_modify_dump(fn):
 
 	def wrapper(*args, **kwargs):
 		dg = load_graph()
-		print "Loaded graph"
+		#print "Loaded graph"
 		result = fn(dg, *args, **kwargs)
-		print "Modified graph"
+		#print "Modified graph"
 		data = dump_graph(dg)
-		print "Graph data: ", data
+		#print "Graph data: ", data
 		return result
 		
 	return wrapper

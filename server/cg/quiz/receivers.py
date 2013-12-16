@@ -34,6 +34,6 @@ def create_aggregate_attempt(attempt):
 def clear_cache(sender, **kwargs):
 	topic = kwargs['instance'].concept.topic
 	clear_quizzes_by_topic_cache(topic=topic)
-	print "Quiz cache cleared", topic
+
 
 
