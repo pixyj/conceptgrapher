@@ -198,7 +198,7 @@ var TopicSkillAnalysis = Backbone.Model.extend({
 		this.streak = 0;
 	},
 	start: function() {
-		var index = this.concepts.length / 2;
+		var index = Math.floor(this.concepts.length / 2);
 		this.setNextConcept(index);
 	},
 	setNextConcept: function(index) {
@@ -313,10 +313,11 @@ var initAnalysis = function() {
 	var v = new AnalysisQuizContainerView({model: a});
 	v.render();
 	$("#content-wrapper").html(v.$el);
-	a.start();
-	var r = new Backbone.Router();
 	Backbone.history.start();
+	var r = new Backbone.Router();
 	r.navigate("analysis");
+	a.start();
+	
 }
 
 

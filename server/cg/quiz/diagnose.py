@@ -6,14 +6,21 @@ from topo.serializers import ConceptSerializer
 
 from .serializers import QuizSerializer
 
+def get_quiz_by_topic_cache_key(topic):
+	return "quiz:topic:{}".format(topic.slug)
+
 def get_serialized_quizzes_by_topic(topic):
-	cache_key = "quiz:topic:{}".format(topic.slug)
+	cache_key = get_quiz_by_topic_cache_key(topic)
 	result = cache.get(cache_key)
 	if not result:
 		result = get_quizzes_by_topic(topic)
 		result = simplejson.dumps(result)
-		cache.set(cache_key, result, 60*15)
+		cache.set(cache_key, result)
 	return result
+
+def clear_quizzes_by_topic_cache(topic):
+	cache_key = get_quiz_by_topic_cache_key(topic)
+	cache.delete(cache_key)
 
 def get_quizzes_by_topic(topic):
 	concept_serializer = ConceptSerializer()

@@ -1,8 +1,10 @@
 from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 
-
 from .models import AggregateConceptAttempt, UserQuizAttempt, AnonQuizAttempt
+from .models import Quiz
+from .diagnose import clear_quizzes_by_topic_cache
+
 
 @receiver(post_save, sender=UserQuizAttempt)
 def add_user_aggregate_attempt(sender, **kwargs):
@@ -28,5 +30,10 @@ def create_aggregate_attempt(attempt):
 	print "Aggregate saved: ", aggregate
 	return aggregate
 
+@receiver(post_save, sender=Quiz)
+def clear_cache(sender, **kwargs):
+	topic = kwargs['instance'].concept.topic
+	clear_quizzes_by_topic_cache(topic=topic)
+	print "Quiz cache cleared", topic
 
 

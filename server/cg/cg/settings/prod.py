@@ -4,7 +4,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost']
 
-COMPRESS_ENABLED = True
+COMPRESS_ENABLED = False
 
 
 
