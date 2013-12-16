@@ -9,7 +9,4 @@ class Person(object):
 p = Person(name="spam")
 in_caps = p.capitalize_name
 name = in_caps()
-
-
-
-
+ 

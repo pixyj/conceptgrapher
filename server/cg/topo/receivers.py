@@ -13,7 +13,7 @@ import graph
 def add_node(sender, **kwargs):
 	if not kwargs['created']:
 		return
-
+		
 	instance = kwargs['instance']
 	graph.add_concept(instance)
 

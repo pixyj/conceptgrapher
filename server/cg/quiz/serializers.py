@@ -5,7 +5,6 @@ class QuizSerializer(ModelSerializer):
 	class Meta:
 		fields = ['id', 'question', 'answer']
 
-
 	def to_dict(self, model):
 		attrs = super(QuizSerializer, self).to_dict(model)
 		choices = []

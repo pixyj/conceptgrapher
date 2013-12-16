@@ -2,8 +2,9 @@ from django.test import TestCase, TransactionTestCase, Client
 from django.db import IntegrityError
 
 from networkx import NetworkXUnfeasible
+from topo.graph import initialize_graph
 
-from topo.models import Topic, Concept, ConceptRelationship, ConceptQuiz
+from topo.models import Topic, Concept, ConceptRelationship
 from quiz.models import Quiz, Choice
 
 import simplejson
@@ -15,6 +16,7 @@ class ConceptSlugTestCase(TransactionTestCase):
 	"""
 
 	def setUp(self):
+		initialize_graph()
 		topic = Topic.objects.create(name="topic")
 		Concept.objects.create(topic=topic, name="Concept One")
 
@@ -33,6 +35,7 @@ class ModelIntegrityTestCase(TestCase):
 	"""
 
 	def setUp(self):
+		initialize_graph()
 		self.topic = Topic.objects.create(name="1")
 		self.c1 = Concept.objects.create(topic=self.topic, name="2")
 		self.c2 = Concept.objects.create(topic=self.topic, name="3")
@@ -62,6 +65,7 @@ class TopologyTest(TransactionTestCase):
 	Ensures if Error is raised when the concept graph becomes cyclic.
 	"""
 	def setUp(self):
+		initialize_graph()
 		self.t = Topic.objects.create(name="one")
 		self.c1 = Concept.objects.create(topic=self.t, name="1")
 		self.c2 = Concept.objects.create(topic=self.t, name="2")
@@ -98,56 +102,4 @@ class TopologyTest(TransactionTestCase):
 		raise NetworkXUnfeasible
 
 			
-
-class ConceptByTopicTest(TestCase):
-	def setUp(self):
-		self.t = Topic.objects.create(name="One Two Three")
-		self.CONCEPT_COUNT = 10
-		for i in xrange(self.CONCEPT_COUNT):
-			Concept.objects.create(topic=self.t, name=str(i))
-
-
-	def test_json_response(self):
-		c = Client()
-		response = c.get("/api/topo/topic/one-two-three/concepts")
-		
-		self.assertEqual(response.status_code, 200)
-		concepts = simplejson.loads(response.content)
-		self.assertEqual(len(concepts), self.CONCEPT_COUNT)
-
-
-	def test_404(self):
-		c = Client()
-		response = c.get("/api/topo/topic/asdfasdf/concepts")
-		self.assertEqual(response.status_code, 404)
-
-
-class QuizzesByConceptTest(TestCase):
-	def setUp(self):
-		self.QUIZ_COUNT = 10
-		self.CHOICE_COUNT = 4
-		self.topic = Topic.objects.create(name="1")
-		self.c1 = Concept.objects.create(topic=self.topic, name="2")
-
-		for i in xrange(self.QUIZ_COUNT):
-			q = Quiz.objects.create(question="question:{}".format(i))
-			ConceptQuiz.objects.create(concept=self.c1, quiz=q)
-			for i in xrange(self.CHOICE_COUNT):
-				Choice.objects.create(quiz=q, text="yep {}".format(i), is_correct=True)
-
-
-
-	def test_quiz_by_concept(self):
-		c = Client()
-		response = c.get("/api/topo/concept/1/quizzes")
-		self.assertEqual(response.status_code, 200)
-		quizzes = simplejson.loads(response.content)
-		self.assertEqual(len(quizzes), self.QUIZ_COUNT)
-		for q in quizzes:
-			self.assertEqual(len(q['choices']), self.CHOICE_COUNT)
-
-
-	def test_404(self):
-		response = Client().get("/api/topo/concept/10000/quizzes")
-		self.assertEqual(response.status_code, 404)
 
