@@ -5,4 +5,5 @@ django-pagedown
 redis
 django-redis
 django-compressor
+psycopg2
 
