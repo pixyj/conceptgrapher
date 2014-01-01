@@ -7,11 +7,10 @@
 	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/base.css">
 	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/quiz.css">
-
-	{% block css %}
-	{% endblock %}
-
 {% endcompress %}
+
+{% block css %}
+{% endblock %}
 
 </head>
 
@@ -60,15 +59,15 @@
 		<script type="text/javascript" src="{{ STATIC_URL }}js/lib/csrf.js"></script>
 
 		{% include 'quiz-js.html' %}
-		{% block js %}
-		{% endblock %}
+
 		
 		{% endcompress %}
 
 		{% block templates %}
 		{% endblock %}
 
-		
+		{% block js %}
+		{% endblock %}
 
 	</div>	
 

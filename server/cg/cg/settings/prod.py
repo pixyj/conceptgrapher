@@ -1,14 +1,10 @@
 from .base import *
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost']
 
-COMPRESS_ENABLED = False
+COMPRESS_ENABLED = True
 
-
-
-
-
-
+COMPRESS_OFFLINE = True
 

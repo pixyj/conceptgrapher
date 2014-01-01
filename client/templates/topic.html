@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 	
 {% block css %}
+{% load compress %}
+{% compress css %}
 	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/topic.css">
 {% endblock %}
+{% endcompress %}
 
 
 {% block content %}
@@ -74,7 +77,10 @@
 
 
 {% block js %}
+{% load compress %}
+{% compress js %}
 		<script type="text/javascript" src="{{ STATIC_URL }}js/topic-page.js"> </script>
+{% endcompress %}
 {% endblock %}
 
 
