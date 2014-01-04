@@ -60,3 +60,8 @@ def render_topic(request, topic_slug):
 		"stats": simplejson.dumps(stats)
 	});
 
+
+
+def render_home(request):
+	return render(request, "home.html")
+

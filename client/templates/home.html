@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}
+    ConceptGrapher
+{% endblock %}
+
+{% block content %}
+
+<h2>
+    Welcome to ConceptGrapher!
+</h2>
+
+
+
+    This app was born when I noticed that tutorials and documentations on the web 
+    don't really assess whether you've mastered the material.
+    <br/><br/>
+    ConceptGrapher complements these tutorials by assessing your existing skills in a particular topic and then helping you navigate through the tutorial through 
+    your answers to quizzes. <br/>
+
+    <h4> How does it work?</h4>
+    ConceptGrapher works by breaking down a particular topic into atomic concepts and 
+    creating a dependency graph among the concepts. <br/>
+    Let's take python as an example. You need to understand what a <i>function</i> does
+    before learning about <i>keyword arguments</i>. So <i>function</i> is a prerequisite to <i>keyword 
+    arguments</i>.<br/><br/>
+
+    Similar relationships are created among other concepts in the topic. Finally, the concepts are 
+    sorted topologically to navigate you through the tutorial in the order of learning.
+
+    <br/> <br/>
+    Sounds interesting? Get Started with the <a href="/python/">Python 2.7 Tutorial! </a>
+
+{% endblock %}
+

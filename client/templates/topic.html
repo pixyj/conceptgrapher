@@ -4,8 +4,9 @@
 {% load compress %}
 {% compress css %}
 	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/topic.css">
-{% endblock %}
+
 {% endcompress %}
+{% endblock %}
 
 
 {% block content %}
@@ -31,7 +32,8 @@
 	{% include "quiz-templates.html" %}
 
 <script type="text/html" id="quiz-container-template">
-	<h2> Try to answer these questions to see where you are </h2>
+	<h2>Welcome! Take this initial test before diving deep. Don't worry 
+	if you don't know the answer.</h2>
 	<div id="quiz-container">
 		<h2 id="now-concept"> </h2>
 		<div class="now-quiz">
