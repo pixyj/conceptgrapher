@@ -145,6 +145,7 @@ var QuizView = BaseView.extend({
 * Models and Collections
 ******************************************************************************/
 
+
 var Choice = Backbone.Model.extend({
 	defaults: {
 		hasMultipleAnswers: false

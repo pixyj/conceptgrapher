@@ -63,5 +63,6 @@ def render_topic(request, topic_slug):
 
 
 def render_home(request):
+	#import pdb;pdb.set_trace()
 	return render(request, "home.html")
 
