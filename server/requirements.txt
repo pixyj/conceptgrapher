@@ -6,4 +6,4 @@ redis
 django-redis
 django-compressor
 psycopg2
-
+gunicorn

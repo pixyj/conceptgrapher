@@ -39,6 +39,7 @@ INSTALLED_APPS = (
 
     'pagedown',
     'compressor',
+    'gunicorn',
     
     'uber',
     'topo',
@@ -102,4 +103,10 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'compressor.finders.CompressorFinder',
 )
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+}
 
