@@ -30,7 +30,7 @@ var QuizContainerView = BaseView.extend({
 		this.afterRender();
 	},
 	showNext:function(model) {
-		this.showNextUnanswered(model);
+		this.showNextUnanswered(true);
 		//this.setNowViewByIndex(model.get("index") + 1);
 	},
 	setNowViewById: function(id) {
@@ -61,7 +61,7 @@ var QuizContainerView = BaseView.extend({
 		}
 		this.setNowViewById(model.get("id"));
 	},
-	showNextUnanswered: function() {
+	showNextUnanswered: function(navigate) {
 		var length = this.collection.models.length;
 		var i, model;
 		for(i = 0; i < length; i++) {
@@ -71,7 +71,9 @@ var QuizContainerView = BaseView.extend({
 				return;
 			}
 		}
-		App.router.navigate("#done", {trigger: true});
+		if(navigate) {
+			App.router.navigate("#done", {trigger: true});
+		}
 
 	},
 
@@ -140,7 +142,7 @@ var AppRouter = BaseRouter.extend({
 	},
 	setFirstQuiz: function() {	
 		var view = this.setCurrentView("quiz");
-		view.showNextUnanswered();
+		view.showNextUnanswered(false);
 	},
 	setQuiz: function(id) {
 		this.setCurrentView("quiz");
