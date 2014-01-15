@@ -1,5 +1,6 @@
 *.pyc
 *.log
 *.zip
+*.db
 server/cg/cg/static
 
