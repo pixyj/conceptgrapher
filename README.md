@@ -2,7 +2,7 @@ Overview
 ==============
 
 
-Concept Grapher is a django project that complements tutorials through quizzes to test your understanding each concept before you move on the next one. 
+Concept Grapher is a django project that complements tutorials using quizzes to test your understanding each concept before you move on the next one. 
 
 How does it work?
 ----------------
@@ -19,7 +19,7 @@ Future improvements include using a graph store like `neo4j`
 
 Running ConceptGrapher on your local machine
 ----------
-Install [Redis](redis.io) (Used for caching).
+Install [Redis](http://redis.io) (Used for caching).
 
 Create a virtualenv using [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/en/latest/) and work on it.
 
