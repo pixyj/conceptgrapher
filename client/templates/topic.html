@@ -1,5 +1,9 @@
 {% extends "base.html" %}
-	
+
+{% block title %}
+{{ topic.name }} - ConceptGrapher
+{% endblock %}	
+
 {% block css %}
 {% load compress %}
 {% compress css %}
