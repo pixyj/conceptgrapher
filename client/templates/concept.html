@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block title %}
+{{ concept.name }} - {{ topic.name }}
+{% endblock %}	
+
+
 {% block css %}
 	{% load compress %}
 	{% compress css %}
