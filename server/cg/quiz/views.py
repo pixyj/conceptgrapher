@@ -28,6 +28,8 @@ def get_unique_user_key_from_request(request):
 
 def create_attempt(request):
 
+	if request.method != 'POST':
+		return HttpResponse(status=400)
 
 	attrs = simplejson.loads(request.body)
 	quiz = get_object_or_404(Quiz, pk=attrs.get("quizId"))
