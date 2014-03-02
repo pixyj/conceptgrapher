@@ -9,6 +9,7 @@ from django.forms import model_to_dict
 from .models import Concept, ConceptRelationship
 import graph
 
+
 @receiver(post_save, sender=Concept)
 def add_node(sender, **kwargs):
 	if not kwargs['created']:

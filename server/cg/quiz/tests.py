@@ -1,12 +1,16 @@
 from django.test import TestCase
+from django.contrib.auth.models import User
+from django.db import IntegrityError
 
 from topo import graph
 from topo.models import Topic, Concept
 
-from .models import Quiz
+from .models import Quiz, QuizAttempt
 from .diagnose import get_serialized_quizzes_by_topic
 
 import simplejson
+
+
 def json_decode(x):
     return simplejson.loads(x)
 
@@ -36,3 +40,22 @@ class QuizByTopicTest(QuizBaseTest):
 
     
         
+class QuizCreationTest(QuizBaseTest):
+
+    def test_create(self):
+        quiz = Quiz.objects.get(id=1)
+        user = User.objects.create(username="one", password="one")
+
+        x = QuizAttempt.objects.create_quiz_attempt(quiz=quiz, user=user, result=False, guess="what")
+        self.assertEqual(x.attempt_number, 1)
+        y = QuizAttempt.objects.create_quiz_attempt(quiz=quiz, user=user, result=False, guess="yep")
+        self.assertEqual(y.attempt_number, 2)
+
+        duplicate = False
+        try:
+            z = QuizAttempt.objects.create_quiz_attempt(quiz=quiz, user=user, result=False, guess="what")
+        except IntegrityError:
+            duplicate = True
+
+        self.assertEqual(duplicate, True)
+

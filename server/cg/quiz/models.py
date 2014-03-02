@@ -55,58 +55,59 @@ class Choice(models.Model):
 """
 Todo: Extend django.contrib.auth.User
 """
-def get_unique_user_key(**kwargs):
-	if kwargs.get("user"):
-		return str(kwargs['user'].id)
-	elif kwargs.get("session_key"):
-		return kwargs['session_key'][0:5]
-
-	assert(False)
 
 
-class BaseQuizAttempt(models.Model):
+
+class QuizAttemptManager(models.Manager):
+	def create_quiz_attempt(self, **kwargs):
+
+		user_key = kwargs["user_key"] = self.get_unique_user_key(kwargs)
+		previous_attempts = self.filter(user_key=user_key, quiz=kwargs.get("quiz")).order_by("-attempt_number")[0:1]
+		if previous_attempts:
+			previous_attempt = previous_attempts[0]
+			kwargs['attempt_number'] = previous_attempt.attempt_number + 1
+
+		return self.create(**kwargs)
+
+	def get_unique_user_key(self, args):
+		if args.get("user"):
+			return str(args['user'].id)
+		elif args.get("session_key"):
+			return args['session_key']
+
+		assert(False)
+		
+
+class QuizAttempt(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	quiz = models.ForeignKey(Quiz)
 	guess = models.TextField()
-	result = models.BooleanField()	
-	
-	def get_unique_user_key(self):
-		raise Exception("Subclass must implement this method")
+	result = models.BooleanField()
+	attempt_number = models.IntegerField(default=1)
 
+	user = models.ForeignKey(User, null=True)
+
+	#Used as proxy for either user or session_key so that data constraints are maintained
+	#for both anon and logged in users. 
+	#http://stackoverflow.com/questions/191421/how-to-create-a-unique-index-on-a-null-column
+	user_key = models.CharField(max_length=40)	
+	
+	objects = QuizAttemptManager()
+	
 	def to_dict(self):
 		return QuizAttemptSerializer().to_dict(self)
 
-
-	class Meta:
-		abstract = True
-
-class UserQuizAttempt(BaseQuizAttempt):
-	user = models.ForeignKey(User)	
-	
-	def get_unique_user_key(self):
-		return get_unique_user_key(user=self.user)
-
 	def __unicode__(self):
-		return "{} attempted {} - {}".format(self.user, self.quiz, self.result)
+		return "{} attempted {} - {}".format(self.user or self.session_key, self.quiz, self.result)
+
+
+
 
 	class Meta:
 		unique_together = (
-			("quiz", "user", "guess"), #For logged in users
+			("quiz", "user_key", "guess"),
 		)
 
-class AnonQuizAttempt(BaseQuizAttempt):
-	session_key = models.CharField(max_length=40)
-
-	def get_unique_user_key(self):
-		return get_unique_user_key(session_key=self.session_key)
-
-	def __unicode__(self):
-		return "{} attempted {} - {}".format(self.session_key, self.quiz, self.result)
-		
-	class Meta:
-		unique_together = (
-			("quiz", "session_key", "guess"), #For logged in users
-		)
 
 
 class AggregateConceptAttempt(models.Model):
