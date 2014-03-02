@@ -3,7 +3,10 @@ from django.contrib.auth import login
 from django.http import HttpRequest
 from django.test.client import Client
 
+from django.test import TestCase
 import importlib
+
+from topo import graph
 
 class UserClient(Client):
 
@@ -43,4 +46,17 @@ class UserClient(Client):
 
         # Save the session values.
         request.session.save()
+
+
+
+class UberTest(TestCase):
+
+    fixtures = [
+        'uber/fixtures/all.json'
+    ]
+
+    def _pre_setup(self):
+        graph.initialize_graph()
+        super(UberTest, self)._pre_setup()
+
 

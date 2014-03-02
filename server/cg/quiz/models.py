@@ -6,6 +6,7 @@ from topo.models import Concept
 
 from .serializers import QuizSerializer, QuizAttemptSerializer
 
+
 class Quiz(TimestampedModel):
 	concept = models.ForeignKey(Concept)
 	question = models.TextField(unique=True)
@@ -14,17 +15,10 @@ class Quiz(TimestampedModel):
 	def to_dict(self):
 		return QuizSerializer().to_dict(self)
 
-	def to_dict_with_user_attempts(self, user):
-		attrs = self.to_dict_with_filter(UserQuizAttempt, user=user)
-		return attrs
-
-	def to_dict_with_session_attempts(self, session_key):
-		attrs = self.to_dict_with_filter(AnonQuizAttempt, session_key=session_key)
-		return attrs
-
-	def to_dict_with_filter(self, klass, **kwargs):
+	def user_attempts_to_dict(self, user_key):
+		user_key = str(user_key)
 		attrs = self.to_dict()
-		attempts = klass.objects.filter(**kwargs).filter(quiz=self).all()
+		attempts = QuizAttempt.objects.filter(user_key=user_key).filter(quiz=self).all()
 		attempts = [attempt.to_dict() for attempt in attempts]
 		attrs['attempts'] = attempts
 		attrs['answered'] = False #Initialization. Will be overriden if answered
@@ -60,8 +54,14 @@ Todo: Extend django.contrib.auth.User
 
 class QuizAttemptManager(models.Manager):
 	def create_quiz_attempt(self, **kwargs):
-
-		user_key = kwargs["user_key"] = self.get_unique_user_key(kwargs)
+		user = kwargs.get("user")
+		if user:
+			user_key = str(user.id)
+			kwargs['user_key'] = user_key
+		else:
+			assert(kwargs.get("user_key"))
+        
+        #How to follow PEP standards in below line?
 		previous_attempts = self.filter(user_key=user_key, quiz=kwargs.get("quiz")).order_by("-attempt_number")[0:1]
 		if previous_attempts:
 			previous_attempt = previous_attempts[0]
@@ -73,10 +73,14 @@ class QuizAttemptManager(models.Manager):
 		if args.get("user"):
 			return str(args['user'].id)
 		elif args.get("session_key"):
+			assert(args.get("session_key"))
 			return args['session_key']
 
 		assert(False)
 		
+
+
+USER_KEY_MAX_LENGTH = 40 #Equal to session_key max length
 
 class QuizAttempt(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
@@ -90,7 +94,8 @@ class QuizAttempt(models.Model):
 	#Used as proxy for either user or session_key so that data constraints are maintained
 	#for both anon and logged in users. 
 	#http://stackoverflow.com/questions/191421/how-to-create-a-unique-index-on-a-null-column
-	user_key = models.CharField(max_length=40)	
+	
+	user_key = models.CharField(max_length=USER_KEY_MAX_LENGTH)	
 	
 	objects = QuizAttemptManager()
 	
@@ -98,10 +103,7 @@ class QuizAttempt(models.Model):
 		return QuizAttemptSerializer().to_dict(self)
 
 	def __unicode__(self):
-		return "{} attempted {} - {}".format(self.user or self.session_key, self.quiz, self.result)
-
-
-
+		return "{} attempted {} - {}".format(self.user or self.user_key, self.quiz, self.result)
 
 	class Meta:
 		unique_together = (
@@ -112,7 +114,7 @@ class QuizAttempt(models.Model):
 
 class AggregateConceptAttempt(models.Model):
 	concept = models.ForeignKey(Concept)
-	user_key = models.CharField(max_length=5)
+	user_key = models.CharField(max_length=USER_KEY_MAX_LENGTH)
 	correct = models.IntegerField(default=0)
 	wrong = models.IntegerField(default=0)
 
@@ -126,7 +128,6 @@ def get_topic_stats_by_user(topic, user_key):
 	stats = AggregateConceptAttempt.objects.filter(user_key=user_key).filter(
 		concept__in=concepts)
 	return (concepts, stats)
-
 
 
 #signals

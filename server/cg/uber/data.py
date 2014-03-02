@@ -3,6 +3,8 @@ from django.core import serializers, management
 from topo import graph
 from topo.models import ConceptRelationship
 
+from django.conf import settings
+from redis_cache import get_redis_connection
 
 def load_table(fixture_file):
 	uber_dir = os.path.dirname(os.path.realpath(__file__))
@@ -19,7 +21,10 @@ def load_all():
 	management.call_command("loaddata", fixture_path)
 		
 def clear_all():
-	graph.delete_graph()
+	if not settings.DEBUG:
+		raise Exception("Can't clear everything when not in DEBUG mode, dude")
+
+	get_redis_connection().flushdb()
 	base_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 	db_path = os.path.join(base_dir, "cg/sqlite3.db")
 	os.remove(db_path)

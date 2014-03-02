@@ -8,6 +8,8 @@ from topo.models import Topic, Concept
 from .models import Quiz, QuizAttempt
 from .diagnose import get_serialized_quizzes_by_topic
 
+from uber.tests import UberTest
+
 import simplejson
 
 
@@ -16,16 +18,9 @@ def json_decode(x):
 
 
 
-class QuizBaseTest(TestCase):
-    fixtures = [
-        'uber/fixtures/all.json'
-    ]
 
-    def _pre_setup(self):
-        graph.initialize_graph()
-        super(QuizBaseTest, self)._pre_setup()
 
-class QuizByTopicTest(QuizBaseTest):
+class QuizByTopicTest(UberTest):
 
     def test_get_quizzes_by_topic(self):
         t = Topic.objects.get(id=1)
@@ -40,9 +35,9 @@ class QuizByTopicTest(QuizBaseTest):
 
     
         
-class QuizCreationTest(QuizBaseTest):
+class QuizCreationTest(UberTest):
 
-    def test_create(self):
+    def test_user_create(self):
         quiz = Quiz.objects.get(id=1)
         user = User.objects.create(username="one", password="one")
 
@@ -58,4 +53,24 @@ class QuizCreationTest(QuizBaseTest):
             duplicate = True
 
         self.assertEqual(duplicate, True)
+
+
+        def test_anon_create(self):
+            quiz = Quiz.objects.get(id=1)
+            user_key = "34ssdfafdadfe"
+
+            x = QuizAttempt.objects.create_quiz_attempt(quiz=quiz, user_key=user_key, result=False, guess="what")
+            self.assertEqual(x.attempt_number, 1)
+            y = QuizAttempt.objects.create_quiz_attempt(quiz=quiz, user_key=user_key, result=True, guess="yep")
+            self.assertEqual(y.attempt_number, 2)
+
+            duplicate = False
+            try:
+                z = QuizAttempt.objects.create_quiz_attempt(quiz=quiz, user_key=user_key, result=True, guess="yep")
+            except IntegrityError:
+                duplicate = True
+
+            self.assertEqual(duplicate, True)
+
+
 
