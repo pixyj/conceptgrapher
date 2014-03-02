@@ -8,6 +8,8 @@ import importlib
 
 from topo import graph
 
+from redis_cache import get_redis_connection
+
 class UserClient(Client):
 
     def login_user(self, user):
@@ -60,3 +62,5 @@ class UberTest(TestCase):
         super(UberTest, self)._pre_setup()
 
 
+    def tearDown(self):
+        get_redis_connection().flushdb()

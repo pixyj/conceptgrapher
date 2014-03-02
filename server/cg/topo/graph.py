@@ -1,6 +1,7 @@
 import simplejson
 import networkx as nx
-import redis
+
+from redis_cache import get_redis_connection
 
 REDIS_KEYS = {
 	"top_sorted_list": "graph:top_sorted_list",
@@ -11,7 +12,7 @@ def initialize_graph():
 	build_graph([])
 
 def delete_graph():
-	client = redis.StrictRedis()
+	client = get_redis_connection()
 	for graph_key, redis_key in REDIS_KEYS.iteritems():
 		client.delete(redis_key)
 
@@ -36,7 +37,7 @@ def dump_graph(dg):
 	
 	data = {"edges": dg.edges(), "nodes":dg.nodes()}
 	json_data = simplejson.dumps(data)
-	client = redis.Redis()
+	client = get_redis_connection()
 	client.set(REDIS_KEYS["full"], json_data)
 	top_sort_and_store(dg)
 	return data
@@ -46,7 +47,7 @@ def load_graph():
 	JSONed graph in redis to DiGraph object (dg)
 	"""
 
-	client = redis.Redis()
+	client = get_redis_connection()
 	data = client.get(REDIS_KEYS["full"])
 	data = simplejson.loads(data)
 	dg = nx.DiGraph()
@@ -62,21 +63,21 @@ def top_sort_and_store(dg):
 	"""
 	
 	top_sorted_concepts = nx.topological_sort(dg)
-	client = redis.StrictRedis()
+	client = get_redis_connection()
 	pipeline = client.pipeline()
 	pipeline.set(REDIS_KEYS["top_sorted_list"], simplejson.dumps(top_sorted_concepts))
 	pipeline.execute()
 	return dg
 
 def get_top_sorted_concept_id_list():
-	client = redis.StrictRedis()
+	client = get_redis_connection()
 	json_ids = client.get(REDIS_KEYS['top_sorted_list'])
 	return simplejson.loads(json_ids)
 
 def get_top_sorted_concept_id_dict(**kwargs):
 	concept_list = kwargs.get("concept_list")
 	if not concept_list:
-		client = redis.StrictRedis()
+		client = get_redis_connection()
 		json_data = client.get(REDIS_KEYS['top_sorted_list'])
 		concept_list = simplejson.loads(json_data)
 

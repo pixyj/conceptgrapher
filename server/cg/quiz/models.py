@@ -59,7 +59,9 @@ class QuizAttemptManager(models.Manager):
 			user_key = str(user.id)
 			kwargs['user_key'] = user_key
 		else:
-			assert(kwargs.get("user_key"))
+			user_key = kwargs.get("user_key")
+		
+		assert(user_key)
         
         #How to follow PEP standards in below line?
 		previous_attempts = self.filter(user_key=user_key, quiz=kwargs.get("quiz")).order_by("-attempt_number")[0:1]
