@@ -18,9 +18,15 @@ def get_unique_user_key_from_request(request):
 	if request.user.is_authenticated():
 		user_key = QuizAttempt.objects.get_unique_user_key({"user": request.user})
 	else:
+		#continue Here
+		#import ipdb;ipdb.set_trace()
 		session_key = request.session.session_key
 		if not session_key:
-			session_key = request.session._get_or_create_session_key()	
+			session_key = request.session._get_or_create_session_key()
+			request.session.modified = True	
+			request.session.save()
+			
+
 		user_key = QuizAttempt.objects.get_unique_user_key({"session_key": session_key})
 
 	return user_key
@@ -43,7 +49,9 @@ def create_attempt(request):
 		attrs['user'] = request.user
 
 	try:
-		QuizAttempt.objects.create_quiz_attempt(**attrs)
+		#import ipdb;ipdb.set_trace()
+		attempt = QuizAttempt.objects.create_quiz_attempt(**attrs)
+		print attempt
 	except IntegrityError:
 		return HttpResponse(status=400)
 

@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from django.forms import model_to_dict
 
 from .models import Concept, ConceptRelationship
-import graph
+from . import graph
 
 
 @receiver(post_save, sender=Concept)
@@ -27,7 +27,7 @@ def remove_node(sender, **kwargs):
 @receiver(post_save, sender=ConceptRelationship)
 def add_relationship(sender, **kwargs):
 	instance = kwargs['instance']
-	print "Adding relationship", instance
+	#print "Adding relationship", instance
 	graph.add_concept_relationship(instance.before, instance.after)
 
 

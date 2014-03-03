@@ -7,16 +7,18 @@ from topo.graph import initialize_graph
 from topo.models import Topic, Concept, ConceptRelationship
 from quiz.models import Quiz, Choice
 
+from uber.tests import UberTest
+
 import simplejson
 
-class ConceptSlugTestCase(TransactionTestCase):
+class ConceptSlugTestCase(UberTest):
 	"""
 	Check if slug updates on edit
 	This tests uber's on_save method
 	"""
 
 	def setUp(self):
-		initialize_graph()
+		#initialize_graph()
 		topic = Topic.objects.create(name="topic")
 		Concept.objects.create(topic=topic, name="Concept One")
 
@@ -29,13 +31,13 @@ class ConceptSlugTestCase(TransactionTestCase):
 		self.assertEqual(c.slug, "concept-two") 
 
 
-class ModelIntegrityTestCase(TestCase):
+class ModelIntegrityTestCase(UberTest):
 	"""
 	Ensure that meta unique_together stuff is right
 	"""
 
 	def setUp(self):
-		initialize_graph()
+		#initialize_graph()
 		self.topic = Topic.objects.create(name="1")
 		self.c1 = Concept.objects.create(topic=self.topic, name="2")
 		self.c2 = Concept.objects.create(topic=self.topic, name="3")
@@ -60,12 +62,12 @@ class ModelIntegrityTestCase(TestCase):
 		raise IntegrityError
 
 
-class TopologyTest(TransactionTestCase):
+class TopologyTest(UberTest):
 	"""
 	Ensures if Error is raised when the concept graph becomes cyclic.
 	"""
 	def setUp(self):
-		initialize_graph()
+		#initialize_graph()
 		self.t = Topic.objects.create(name="one")
 		self.c1 = Concept.objects.create(topic=self.t, name="1")
 		self.c2 = Concept.objects.create(topic=self.t, name="2")
