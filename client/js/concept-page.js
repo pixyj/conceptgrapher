@@ -102,6 +102,7 @@ var AttemptDetailedTableView = TableView.extend({
 	SingleView: AttemptDetailedView,
 	afterRender: function() {
 		this.$el.addClass("table table-striped table-bordered table-hover");
+		this.$el.prop("id", "stats-table")
 	}
 });
 
