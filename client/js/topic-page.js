@@ -175,9 +175,9 @@ var ConceptPlusStatsCollection = Backbone.Collection.extend({
 * 1. Fetch all concepts in topic with one quiz each.
 * 2. Start off with quiz in median concept.
 * 3. If quiz is answered correctly, go to next concept
-*    	Continue until quiz is answered incorrectly.
+*        Continue until quiz is answered incorrectly.
 * 4. If not, got to previous concept.
-* 5. 	Continue until quiz is answered correctly.
+* 5.     Continue until quiz is answered correctly.
 * 6. Direct user to current concept.
 
 Lots of work to be done in routing student to the concept according 
@@ -277,10 +277,10 @@ var init = function() {
 	} else {
 		initAnalysis();
 	}
-}
+};
 
 var initDashboard = function() {
-	var statsByConcept = {}
+	var statsByConcept = {};
 	stats.forEach(function(s) {
 		statsByConcept[s.concept_id] = s;
 	});
@@ -303,7 +303,7 @@ var initDashboard = function() {
 	r.navigate("dashboard");
 	return concepts;
 
-}
+};
 
 var initAnalysis = function() {
 	var cc = new ConceptPlusQuizCollection();
@@ -318,7 +318,7 @@ var initAnalysis = function() {
 	r.navigate("analysis");
 	a.start();
 	
-}
+};
 
 
 var testRun = function() {
@@ -328,7 +328,7 @@ var testRun = function() {
 	v.run();
 	console.log(a.toJSON().name);
 
-}
+};
 
 
 $(document).ready(init);

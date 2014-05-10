@@ -102,7 +102,7 @@ var AttemptDetailedTableView = TableView.extend({
 	SingleView: AttemptDetailedView,
 	afterRender: function() {
 		this.$el.addClass("table table-striped table-bordered table-hover");
-		this.$el.prop("id", "stats-table")
+		this.$el.prop("id", "stats-table");
 	}
 });
 
@@ -176,8 +176,8 @@ var initResources = function() {
 	var resources = new ConceptResourceCollection();
 	resources.conceptId = conceptId;
 	resources.fetch();
-	return resources
-}
+	return resources;
+};
 
 
 var init = function() {
@@ -234,6 +234,6 @@ var init = function() {
 
 
 
-}
+};
 
 $(document).ready(init);

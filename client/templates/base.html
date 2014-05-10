@@ -56,24 +56,29 @@
 
 		{% load compress %}
 		{% compress js %}
-		<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jq.js"></script>
-		<script type="text/javascript" src="{{ STATIC_URL }}js/lib/underscore.js"></script>
-		<script type="text/javascript" src="{{ STATIC_URL }}js/lib/backbone.js"></script>
-		
-		<script type="text/javascript" src="{{ STATIC_URL }}js/lift.js"></script>
-		<script type="text/javascript" src="{{ STATIC_URL }}js/lib/csrf.js"></script>
+			<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jq.js"></script>
+			<script type="text/javascript" src="{{ STATIC_URL }}js/lib/underscore.js"></script>
+			<script type="text/javascript" src="{{ STATIC_URL }}js/lib/backbone.js"></script>
+			
+			<script type="text/javascript" src="{{ STATIC_URL }}js/lift.js"></script>
+			<script type="text/javascript" src="{{ STATIC_URL }}js/lib/csrf.js"></script>
 
-		{% include 'quiz-js.html' %}
+			{% include 'quiz-js.html' %}
+
 
 		
 		{% endcompress %}
 
-		{% block templates %}
-		{% endblock %}
-
 		{% block js %}
 		{% endblock %}
 
+		{% block templates %}
+		{% endblock %}
+
+
+
+		{% block config_js %}
+		{% endblock %}
 
 
 	</div>	

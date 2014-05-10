@@ -104,17 +104,18 @@
 
 
 {% block js %}
-{% load compress %}
-{% compress js %}
-	<script type="text/javascript" src="{{ STATIC_URL }}js/concept-page.js"> </script>
-{% endcompress %}
-
-	<script type="text/javascript">
-		App = App || {}
-		App.topicSlug = "{{ topic.slug }}"
-		App.conceptSlug = "{{ concept.slug }}"
-	</script>
-
+    {% load compress %}
+    {% compress js %}
+	   <script type="text/javascript" src="{{ STATIC_URL }}js/concept-page.js"> </script>
+    {% endcompress %}
 {% endblock %}
 
+{% block config_js %}
 
+<script type="text/javascript">
+    App = App || {}
+    App.topicSlug = "{{ topic.slug }}"
+    App.conceptSlug = "{{ concept.slug }}"
+</script>
+
+{% endblock %}

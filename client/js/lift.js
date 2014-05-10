@@ -166,5 +166,5 @@ App.routeWithoutReload = function(router, rootUrl) {
 		router.navigate(relativeUrl, {trigger: true});
 
 
-	})
-}
+	});
+};

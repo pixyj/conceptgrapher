@@ -122,7 +122,7 @@ var QuizView = BaseView.extend({
 		return {
 			result: result,
 			guess: guesses
-		}
+		};
 
 	},
 	submitAnswerOnEnter: function(evt) {
@@ -163,8 +163,9 @@ var Attempt = Backbone.Model.extend({
 		}
 		return attrs;
 	},
+
 	url: function() {
-		return "/api/quiz/attempt/create/"
+		return "/api/quiz/attempt/create/";
 	}
 });
 
@@ -236,13 +237,15 @@ var DetailedAttemptCollection = Backbone.Collection.extend({
 App.mk = new Markdown.Converter();
 
 var Quiz = Backbone.Model.extend({
+	
 	defaults: {
 		answered: false,
 		hasMultipleAnswers: false,
 		showAttempts: true
 	},
+
 	parse: function(attrs) {
-		this.attempts = new AttemptCollection(attrs.attempts)
+		this.attempts = new AttemptCollection(attrs.attempts);
 		delete attrs.attempts;
 		attrs.question = App.mk.makeHtml(attrs.question);
 		attrs.isMCQ = attrs.choices.length !== 0;
@@ -336,7 +339,7 @@ var QuizCollection = Backbone.Collection.extend({
 		});
 		quiz.attempts.forEach(function(m) {
 			self.createDetailedAttempt(quiz, m);
-		})
+		});
 	},
 	createDetailedAttempt: function(quiz, attempt) {
 		var attrs = attempt.toJSON();
@@ -350,11 +353,13 @@ var QuizCollection = Backbone.Collection.extend({
 });
 
 var NextConcept = Backbone.Model.extend({
+	
 	url: function() {
-		return "/api/quiz/concept/" + this.get("conceptId") + "/next"
+		return "/api/quiz/concept/" + this.get("conceptId") + "/next";
 	},
+
 	parse: function(attrs) {
-		attrs.url = "/" + this.get("topicSlug") + "/" + attrs.slug + "/"
+		attrs.url = "/" + this.get("topicSlug") + "/" + attrs.slug + "/";
 		return attrs;
 	}
 
