@@ -27,7 +27,7 @@
 			<span class="label label-success label-answered">✓</span>
 		<% } %>
 		</td>
-		<td><a href="#quiz/<%= id %>"><%= question %> </a></td>
+		<td><a href="/<%= topicSlug %>/<%= conceptSlug %>/quiz/<%= id %>/" class="route-without-reload"><%= question %> </a></td>
 </script>
 
 <script type="text/html" id="quiz-basic-attempt-template">
@@ -63,11 +63,18 @@
 	
 	<button class="quiz-action quiz-next btn btn-success">Next</button>
 	
-	<br/>
+	
 
 	<span class="quiz-wrong-submit">
-	 <a href="#resources" class="quiz-review"> Oops.. Wrong answer. Review.</a>
+	<!-- todo Provide a better message -->
+	  
+	 <a href="../../resources/" class="quiz-review route-without-reload"> 
+	 	Oops... Wrong answer. Learn more.
+	 </a>
+	
 	</span>
+
+	<br/>
 
 	<% if(showAttempts) { %> 
 	<table class="table table-striped table-bordered">

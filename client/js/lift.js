@@ -1,3 +1,11 @@
+/******************************************************************************
+*	App -> Container object. 
+******************************************************************************/
+var App = {
+
+};
+
+
 var BaseView = Backbone.View.extend({
 	initialize: function() {
 		this.$compileTemplate();
@@ -66,7 +74,7 @@ var TableView = ListView.extend({
 		var head = $("<thead>");
 		var headRow = $("<tr>");
 		this.columns.forEach(function(c) {
-			headRow.append($("<th>").html(c))
+			headRow.append($("<th>").html(c));
 		});
 		$(head).append(headRow);
 		this.tbody = $("<tbody>");
@@ -91,7 +99,7 @@ var ContainerMixin = {
 	cleanup: function() {
 		$(this.navLi).removeClass("active");
 	}			
-}
+};
 
 var UpdateModelMixin = {
 	incr: function(attr, by) {
@@ -106,13 +114,14 @@ var UpdateModelMixin = {
 		this.set(attr, old - by);
 		return this;
 	}
-}
+};
 
 var ProgressBaseView = Backbone.View.extend({
 	initialize: function() {
 		var changeEvent = "change:" + this.progressAttr;
 		this.model.on(changeEvent, this.render, this);
 	},
+
 	render: function() {
 		var progress = this.model.get(this.progressAttr);
 		progress *= 100;
@@ -145,4 +154,17 @@ var BaseRouter = Backbone.Router.extend({
 	}
 });
 
+App.routeWithoutReload = function(router, rootUrl) {
+	$(".route-without-reload").click(function(evt) {
 
+		evt.preventDefault();
+		
+		var relativeUrlIndex = this.href.indexOf(rootUrl) + rootUrl.length;
+		relativeUrl = this.href.slice(relativeUrlIndex);
+		
+		console.log("route-without-reload");
+		router.navigate(relativeUrl, {trigger: true});
+
+
+	})
+}

@@ -51,7 +51,7 @@ var QuizContainerView = BaseView.extend({
 		this.nowView.render();
 		$("#quiz-now").html(this.nowView.$el);
 		this.nowView.afterRender();
-		App.router.navigate("quiz/" + model.get("id"));
+		App.router.navigate("quiz/" + model.get("id") + "/");
 	},
 	setNowViewByIndex: function(index) {
 		var model = this.collection.at(index);
@@ -135,27 +135,37 @@ var DoneView = BaseView.extend({
 ******************************************************************************/
 var AppRouter = BaseRouter.extend({
 	routes: {
-		"quiz/:id": "setQuiz",
+		"quiz/:id/": "setQuiz",
+		"quiz/:id": "redirectToSetQuiz",
+		"resources/": "setResources",
+		"stats/": "showStats",
+		"done": "showDone",
 		"": "setFirstQuiz",
-		"resources": "setResources",
-		"stats": "showStats",
-		"done": "showDone"
+
 	},
 	setFirstQuiz: function() {	
 		var view = this.setCurrentView("quiz");
 		view.showNextUnanswered(false);
 	},
+	
 	setQuiz: function(id) {
 		this.setCurrentView("quiz");
 		this.currentView.setNowViewById(id);
 	},
+
+	redirectToSetQuiz: function(id) {
+		this.setQuiz(id);
+	},
+
 	setResources: function() {
 		this.setCurrentView("resources");
 
 	},
+	
 	showStats: function() {
 		this.setCurrentView("stats");
 	},
+	
 	showDone: function() {
 		this.setCurrentView("done");
 	}
@@ -203,8 +213,14 @@ var init = function() {
 		}
 	};
 	qc.add(quizData, {parse: true});
+
+	var rootUrl = function() {
+		return "/" + App.topicSlug + "/" + App.conceptSlug + "/";
+	}();
+
 	App.router = new AppRouter({views: views});
-	Backbone.history.start();
+	Backbone.history.start({pushState: true, root: rootUrl});
+	App.routeWithoutReload(App.router, rootUrl);
 
 	progressView = new ConceptProgressView({model: qc.detailedAttemptCollection.aggregateStats});
 	progressView.render();

@@ -1,11 +1,4 @@
 /******************************************************************************
-*	App -> Container object. 
-******************************************************************************/
-var App = {
-
-}
-
-/******************************************************************************
 *	Views
 ******************************************************************************/
 
@@ -267,8 +260,32 @@ var Quiz = Backbone.Model.extend({
 
 		this.choices = new ChoiceCollection(attrs.choices, {parse:true});
 		delete attrs.choices;
+
+		//set Topic and Concept Slugs used for URL routing on concept page
+		if(App.topicSlug && App.conceptSlug) {
+			this.setSlugs();
+			this.setRelativeUrl(attrs);
+		}
+		
 		return attrs;
 	},
+
+
+	setSlugs: function() {
+		
+		if(App.topicSlug) {
+			this.set("topicSlug", App.topicSlug);
+		}
+		if(App.conceptSlug) {
+			this.set("conceptSlug", App.conceptSlug);
+		}
+	},
+
+	setRelativeUrl: function(attrs) {
+		var relativeUrl = "/" + App.topicSlug + "/" + App.conceptSlug + "/" + "quiz/" + attrs.id + "/";
+		attrs.relativeUrl = relativeUrl;
+	},
+
 	hasMultipleAnswers: function(choices) {
 		var i, length;
 		var answers = 0;
@@ -323,8 +340,11 @@ var QuizCollection = Backbone.Collection.extend({
 	},
 	createDetailedAttempt: function(quiz, attempt) {
 		var attrs = attempt.toJSON();
+		
 		attrs.question = quiz.get("question");
 		attrs.quizId = quiz.get("id");
+		attrs.relativeUrl = quiz.get("relativeUrl");
+
 		this.detailedAttemptCollection.add(attrs, {parse: true});
 	}
 });

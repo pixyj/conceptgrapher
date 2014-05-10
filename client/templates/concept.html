@@ -33,9 +33,24 @@
 
 <div id="sidebar-wrapper" class="container">
    <ul class="nav nav-pills nav-stacked">
-     <li id="resources-li"><a href="#resources">Resources</a></li>
-     <li id="quiz-li"><a href="#">Quizzes</a></li>
-     <li id="stats-li"><a href="#stats">Stats</a></li>
+     
+     <li id="resources-li">
+     	<a href="/{{ topic.slug }}/{{ concept.slug }}/resources/" class="route-without-reload">
+     		Resources
+     	</a>
+     </li>
+     
+     <li id="quiz-li">
+     	<a href="/{{ topic.slug }}/{{ concept.slug }}/" class="route-without-reload">
+     		Quizzes
+     	</a>
+     </li>
+     
+     <li id="stats-li">
+     	<a href="/{{ topic.slug }}/{{ concept.slug }}/stats/" class="route-without-reload">
+     		Stats
+     	</a>
+     </li>
    </ul>
  </div>
 
@@ -93,6 +108,13 @@
 {% compress js %}
 	<script type="text/javascript" src="{{ STATIC_URL }}js/concept-page.js"> </script>
 {% endcompress %}
+
+	<script type="text/javascript">
+		App = App || {}
+		App.topicSlug = "{{ topic.slug }}"
+		App.conceptSlug = "{{ concept.slug }}"
+	</script>
+
 {% endblock %}
 
 

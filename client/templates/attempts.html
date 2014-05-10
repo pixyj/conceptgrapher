@@ -1,6 +1,8 @@
 <script type="text/html" id="attempt-detailed-single-view">
 	<td>
-		<a href="#quiz/<%= quizId %>"><%= question %></a>
+		<a href="<%= relativeUrl %>" class="route-without-reload">
+            <%= question %>
+        </a>
 	</td>
 	<td><%= guess %></td>
 	<td><%= result %></td>
