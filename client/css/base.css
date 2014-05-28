@@ -5,3 +5,15 @@ pre {
 #container {
 	margin-left: 2%;
 }
+
+#header-navbar {
+    background-color: #6f5499;
+}
+
+#header-navbar a {
+    color: white;
+}
+
+#header-navbar a:hover {
+    color: #FFD700;
+}
