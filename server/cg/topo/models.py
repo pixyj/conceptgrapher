@@ -1,3 +1,5 @@
+import string
+
 from django.db import models
 from uber.models import SluggedTimeStampedModel, TimestampedModel
 from uber.cache import cache_key_for
@@ -8,7 +10,10 @@ class Topic(SluggedTimeStampedModel):
 	name = models.CharField(max_length=128, unique=True)
 
 	def to_be_slugged(self):
-		return self.name	
+		return self.name
+
+	def capwords(self):
+		return string.capwords(self.name)
 	
 	def get_top_sorted_concepts(self):
 		concepts = [concept for concept in self.concept_set.all()]
@@ -38,6 +43,9 @@ class Concept(SluggedTimeStampedModel):
 
 	def to_be_slugged(self):
 		return self.name
+
+	def capwords(self):
+		return string.capwords(self.name)
 
 	def __unicode__(self):
 		return "{}: {}".format(self.topic, self.name)

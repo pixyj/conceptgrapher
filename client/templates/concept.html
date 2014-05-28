@@ -14,8 +14,8 @@
 
 
 {% block current-path %}
-	<li> <a href="/{{ topic.slug }}/">{{ topic.name }}</a>
-	<li> <a href="/{{ topic.slug }}/{{ concept.slug }}/">{{ concept.name }}</a> </li>
+	<li> <a href="/{{ topic.slug }}/">{{ topic.capwords }}</a>
+	<li> <a href="/{{ topic.slug }}/{{ concept.slug }}/">{{ concept.capwords }}</a> </li>
 {% endblock %}
 
 {% block content %}

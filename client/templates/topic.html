@@ -13,6 +13,11 @@
 {% endblock %}
 
 
+{% block current-path %}
+	<li> <a href="/{{ topic.slug }}/">{{ topic.capwords }}</a>
+{% endblock %}
+
+
 {% block content %}
 
 <div id="content-wrapper" class="container">

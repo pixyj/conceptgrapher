@@ -1,0 +1,233 @@
+{
+    "nodes": [
+        {
+            "group": 1,
+            "name": "comments"
+        },
+        {
+            "group": 1,
+            "name": "basic expressions"
+        },
+        {
+            "group": 1,
+            "name": "variables"
+        },
+        {
+            "group": 1,
+            "name": "strings"
+        },
+        {
+            "group": 1,
+            "name": "numbers"
+        },
+        {
+            "group": 1,
+            "name": "lists"
+        },
+        {
+            "group": 1,
+            "name": "programming intro"
+        },
+        {
+            "group": 1,
+            "name": "Control Flow Tools"
+        },
+        {
+            "group": 1,
+            "name": "Defining Functions"
+        },
+        {
+            "group": 1,
+            "name": "Defining Functions 2"
+        },
+        {
+            "group": 1,
+            "name": "lists 2"
+        },
+        {
+            "group": 1,
+            "name": "Functional programming tools"
+        },
+        {
+            "group": 1,
+            "name": "dictionaries"
+        },
+        {
+            "group": 1,
+            "name": "Sequences"
+        },
+        {
+            "group": 1,
+            "name": "Sets"
+        },
+        {
+            "group": 1,
+            "name": "The del statement"
+        },
+        {
+            "group": 1,
+            "name": "modules"
+        },
+        {
+            "group": 1,
+            "name": "design-and-philosophy"
+        },
+        {
+            "group": 1,
+            "name": "IO"
+        },
+        {
+            "group": 1,
+            "name": "Keyword arguments and argument lists"
+        },
+        {
+            "group": 1,
+            "name": "Errors and Exceptions"
+        },
+        {
+            "group": 1,
+            "name": "Scopes and Namespaces"
+        },
+        {
+            "group": 1,
+            "name": "Classes"
+        }
+    ],
+    "links": [
+        {
+            "source": 0,
+            "target": 1,
+            "value": 5
+        },
+        {
+            "source": 1,
+            "target": 2,
+            "value": 5
+        },
+        {
+            "source": 2,
+            "target": 3,
+            "value": 5
+        },
+        {
+            "source": 2,
+            "target": 4,
+            "value": 5
+        },
+        {
+            "source": 3,
+            "target": 5,
+            "value": 5
+        },
+        {
+            "source": 4,
+            "target": 5,
+            "value": 5
+        },
+        {
+            "source": 5,
+            "target": 6,
+            "value": 5
+        },
+        {
+            "source": 6,
+            "target": 7,
+            "value": 5
+        },
+        {
+            "source": 7,
+            "target": 8,
+            "value": 5
+        },
+        {
+            "source": 8,
+            "target": 9,
+            "value": 5
+        },
+        {
+            "source": 8,
+            "target": 10,
+            "value": 5
+        },
+        {
+            "source": 8,
+            "target": 19,
+            "value": 5
+        },
+        {
+            "source": 8,
+            "target": 12,
+            "value": 5
+        },
+        {
+            "source": 9,
+            "target": 16,
+            "value": 5
+        },
+        {
+            "source": 10,
+            "target": 13,
+            "value": 5
+        },
+        {
+            "source": 10,
+            "target": 14,
+            "value": 5
+        },
+        {
+            "source": 11,
+            "target": 17,
+            "value": 5
+        },
+        {
+            "source": 12,
+            "target": 13,
+            "value": 5
+        },
+        {
+            "source": 13,
+            "target": 15,
+            "value": 5
+        },
+        {
+            "source": 13,
+            "target": 11,
+            "value": 5
+        },
+        {
+            "source": 14,
+            "target": 13,
+            "value": 5
+        },
+        {
+            "source": 15,
+            "target": 17,
+            "value": 5
+        },
+        {
+            "source": 16,
+            "target": 17,
+            "value": 5
+        },
+        {
+            "source": 17,
+            "target": 18,
+            "value": 5
+        },
+        {
+            "source": 18,
+            "target": 20,
+            "value": 5
+        },
+        {
+            "source": 20,
+            "target": 21,
+            "value": 5
+        },
+        {
+            "source": 21,
+            "target": 22,
+            "value": 5
+        }
+    ]
+}
