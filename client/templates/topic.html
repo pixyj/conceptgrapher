@@ -63,12 +63,18 @@
 		<% } %>	
 		
 	</td>	
-	<td><%= quiz_count %></td>
-	<td><%= results.correct %></td>
 	<td>
+		<a href="<%= url %>"><%= quiz_count %></a>
+	</td>
+	<td>
+		<a href="<%= url %>"><%= results.correct %></a>
+	</td>
+	<td>
+		<a href="<%= url %>">
 		<div class="progress progress-striped">
 			<div class="progress-bar progress-bar-success"></div>
 		</div>
+		</a>
 	</td>
 </script>
 
