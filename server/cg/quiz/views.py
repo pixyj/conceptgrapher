@@ -78,3 +78,13 @@ def get_next_concept(request, concept_id):
 
 
 
+def get_first_attempts(request, quiz_id):
+
+	queryset = QuizAttempt.objects.filter(quiz_id=quiz_id).filter(attempt_number=1)
+	attempts = [attempt.to_dict() for attempt in queryset]
+
+	json_response = simplejson.dumps({"attempts": attempts})
+	return HttpResponse(json_response, content_type="application/json")
+
+
+

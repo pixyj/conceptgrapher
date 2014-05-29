@@ -154,7 +154,6 @@ var ChoiceCollection = Backbone.Collection.extend({
 });
 
 var Attempt = Backbone.Model.extend({
-	idAttribute: "guess",
 	parse: function(attrs) {
 		if(!attrs.created) {
 			attrs.created = new Date();
