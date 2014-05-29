@@ -63,11 +63,12 @@
 		<% } %>	
 		
 	</td>	
+	<td><%= quiz_count %></td>
+	<td><%= results.correct %></td>
 	<td>
-		<%= quiz_count %>
-	</td>
-	<td>
-		<%= results.correct %>
+		<div class="progress progress-striped">
+			<div class="progress-bar progress-bar-success"></div>
+		</div>
 	</td>
 </script>
 

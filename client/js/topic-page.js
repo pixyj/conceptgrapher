@@ -97,14 +97,25 @@ var AnalysisQuizContainerView = BaseView.extend({
 
 var ConceptStatsView = BaseView.extend({
 	template: "#concept-stats-template",
-	tagName: "tr"
+	tagName: "tr",
+
+	render: function() {
+		BaseView.prototype.render.call(this);
+		var attrs = this.model.attributes;
+		var progressPercentage = attrs.results.correct * 100 / attrs.quiz_count + "%";
+		this.$el.find(".progress-bar").css("width", progressPercentage);
+	}
 });
 
 var StatsTableView = TableView.extend({
-	columns: ["Concept", "Quizzes", "Answered Correctly"],
+	columns: ["Concept", "Quizzes", "Answered", "Progress"],
 	SingleView: ConceptStatsView,
 	afterRender: function() {
 		this.$el.addClass("table table-striped table-bordered");
+		var heads = this.$el.find("th")
+		for(var i = 0, length = this.columns.length; i < length; i++) {
+			$(heads[i]).addClass("stats-table-" + this.columns[i].toLowerCase());
+		}
 	}
 });
 

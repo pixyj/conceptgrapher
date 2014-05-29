@@ -1,7 +1,31 @@
 #stats-table {
-	width: 50%;
+	width: 70%;
 }
 
 .label-concept-success {
 	margin-left: 2%;
+}
+
+#stats-table td, th{
+    text-align: center;
+}
+
+.stats-table-concept {
+    width: 30%;
+}
+
+.stats-table-quizzes {
+    width: 20%;
+}
+
+.stats-table-answered {
+    width: 20%;
+}
+
+.stats-table-progress {
+    width: 30%;
+}
+
+.quiz-content pre {
+    width: 70%;
 }
