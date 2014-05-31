@@ -5,6 +5,7 @@
 
 #header-navbar {
     background-color: #6f5499;
+    z-index: 0;
 }
 
 #header-navbar a {
