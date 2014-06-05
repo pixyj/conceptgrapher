@@ -29,3 +29,49 @@ import simplejson
 
 def to_d3_json():
     return simplejson.dumps(to_d3())
+
+
+from uber.cache import memoized
+from topo.models import ConceptRelationship, Concept
+import ipdb
+
+@memoized
+def depth(concept_id):
+    if concept_id == 1:
+        return 0
+
+    #ipdb.set_trace()
+    print "Calculating prereq for ", concept_id, Concept.objects.get(pk=concept_id)    
+    rels = ConceptRelationship.objects.filter(after_id=concept_id)
+    print "prereqs for ", concept_id, rels
+
+    prereq_ids = [rel.before.id for rel in rels]
+    print "prereq_ids: ", prereq_ids
+    depths = [depth(prereq_id) for prereq_id in prereq_ids]
+    
+    print "depths", depths
+    return max(depths) + 1
+
+
+from collections import defaultdict
+
+def all_concept_depths():
+    depths = defaultdict(list)
+    for concept in Concept.objects.all():
+        d = depth(concept.id)
+        depths[d].append(concept)
+
+    return depths
+
+
+
+    
+
+
+
+
+    
+
+
+
+
