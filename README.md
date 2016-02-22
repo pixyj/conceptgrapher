@@ -4,9 +4,13 @@ Overview
 
 Concept Grapher is a django project that complements tutorials using quizzes to test your understanding each concept before you move on to the next one. 
 
+Update - Feb 2016
+---------------
+I've re-written the project. See [github.com/pixyj/feel](github.com/pixyj/feel) 
+
 How does it work?
 ----------------
-Visit the [site](http://conceptgrapher.org) for more info!
+Visit the [site](https://conceptcoaster.com) for more info!
 
 Tech Stack
 ------------------
