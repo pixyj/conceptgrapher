@@ -6,7 +6,7 @@ Concept Grapher is a django project that complements tutorials using quizzes to 
 
 Update - Feb 2016
 ---------------
-I've re-written the project. See [github.com/pixyj/feel](github.com/pixyj/feel) 
+I've re-written the project. See [github.com/pixyj/feel](https://github.com/pixyj/feel) 
 
 How does it work?
 ----------------
